@@ -163,6 +163,7 @@ let selectedRegionFilter = 'all';
 // Initialize application on DOM ready
 document.addEventListener('DOMContentLoaded', async () => {
   initLanguage();
+  initLiveClockHud();
   initNavigation();
   initRegionFilters();
   initScopeTabs();
@@ -172,15 +173,67 @@ document.addEventListener('DOMContentLoaded', async () => {
   initReportModal();
 });
 
+// Live Grid Telemetry HUD (GMT+3 EAT & Ethiopian Dual Clock/Date Ticker)
+function initLiveClockHud() {
+  const eatEl = document.getElementById('hudTimeEat');
+  const ethEl = document.getElementById('hudTimeEth');
+  const statusEl = document.getElementById('hudGridStatus');
+
+  function updateClock() {
+    const now = new Date();
+    // East Africa Time is UTC+3
+    const utcHours = now.getUTCHours();
+    const eatHours = (utcHours + 3) % 24;
+    const eatMins = String(now.getUTCMinutes()).padStart(2, '0');
+    const eatSecs = String(now.getUTCSeconds()).padStart(2, '0');
+
+    if (eatEl) {
+      eatEl.textContent = `${String(eatHours).padStart(2, '0')}:${eatMins}:${eatSecs} EAT`;
+    }
+
+    if (ethEl) {
+      const ethTime = formatEthiopianTime(now.toISOString());
+      const ethDate = formatEthiopianDate(now.toISOString());
+      if (ethTime && ethDate) {
+        ethEl.textContent =
+          currentLang === 'am'
+            ? `${ethTime.am} • ${ethDate.formattedAm}`
+            : `${ethTime.en} • ${ethDate.formattedEn}`;
+      }
+    }
+
+    if (statusEl) {
+      let activeCount = 0;
+      woredaStatusMap.forEach((status) => {
+        if (['CURRENT', 'CONFIRMED', 'LIKELY'].includes(status.current_status)) {
+          activeCount++;
+        }
+      });
+      if (activeCount > 0) {
+        statusEl.textContent = `GRID ALERT: ${activeCount} AREAS IMPACTED`;
+        statusEl.previousElementSibling?.classList.remove('led-emerald');
+        statusEl.previousElementSibling?.classList.add('led-crimson');
+      } else {
+        statusEl.textContent = `GRID NOMINAL • 116 WOREDAS MONITORED`;
+        statusEl.previousElementSibling?.classList.remove('led-crimson');
+        statusEl.previousElementSibling?.classList.add('led-emerald');
+      }
+    }
+  }
+
+  updateClock();
+  setInterval(updateClock, 1000);
+}
+
 function initScopeTabs() {
   document.querySelectorAll('.outages-tab-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.outages-tab-btn').forEach((b) => {
-        b.classList.remove('bg-amber-500', 'text-slate-950', 'font-bold');
+        b.classList.remove('bg-[#06b6d4]', 'text-[#00252e]', 'font-bold', 'shadow-sm');
         b.classList.add('text-slate-400');
       });
       btn.classList.remove('text-slate-400');
-      btn.classList.add('bg-amber-500', 'text-slate-950', 'font-bold');
+      btn.classList.add('bg-[#06b6d4]', 'text-[#00252e]', 'font-bold', 'shadow-sm');
       selectedOutagesScope = btn.getAttribute('data-tab');
 
       const banner = document.getElementById('historyBanner');
@@ -218,11 +271,11 @@ function initRegionFilters() {
   document.querySelectorAll('.region-filter-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.region-filter-btn').forEach((b) => {
-        b.classList.remove('bg-amber-500', 'text-slate-950', 'font-bold');
+        b.classList.remove('bg-[#2a2a2c]', 'text-[#4cd7f6]', 'font-semibold');
         b.classList.add('text-slate-400');
       });
       btn.classList.remove('text-slate-400');
-      btn.classList.add('bg-amber-500', 'text-slate-950', 'font-bold');
+      btn.classList.add('bg-[#2a2a2c]', 'text-[#4cd7f6]', 'font-semibold');
       selectedRegionFilter = btn.getAttribute('data-filter');
       renderOutagesList();
     });
@@ -238,7 +291,7 @@ function initLanguage() {
   if (langBtn) {
     langBtn.addEventListener('click', () => {
       currentLang = currentLang === 'en' ? 'am' : 'en';
-      langBtn.textContent = currentLang === 'en' ? 'አማርኛ' : 'English';
+      langBtn.innerHTML = `<span>🌐</span><span>${currentLang === 'en' ? 'አማርኛ' : 'English'}</span>`;
       applyTranslations();
       updateMapLabels();
       renderOutagesList();
@@ -271,6 +324,23 @@ function initNavigation() {
     });
   });
 
+  // Global keyboard shortcut '/' to focus search
+  document.addEventListener('keydown', (e) => {
+    const searchInput = document.getElementById('searchInput');
+    if (
+      e.key === '/' &&
+      document.activeElement !== searchInput &&
+      document.activeElement.tagName !== 'INPUT' &&
+      document.activeElement.tagName !== 'TEXTAREA'
+    ) {
+      e.preventDefault();
+      if (searchInput) {
+        searchInput.focus();
+        searchInput.select();
+      }
+    }
+  });
+
   const detailModal = document.getElementById('detailModal');
   if (detailModal) {
     detailModal.addEventListener('click', (e) => {
@@ -285,7 +355,7 @@ function switchView(viewName) {
   currentView = viewName;
   document.querySelectorAll('.view-section').forEach((sec) => sec.classList.add('hidden'));
   document.querySelectorAll('.nav-link').forEach((link) => {
-    link.classList.remove('text-amber-400', 'border-b-2', 'border-amber-400');
+    link.classList.remove('text-[#4cd7f6]', 'bg-cyan-950/40', 'border', 'border-cyan-500/30', 'shadow-sm');
     link.classList.add('text-slate-300');
   });
 
@@ -295,7 +365,7 @@ function switchView(viewName) {
   const activeLink = document.querySelector(`.nav-link[data-view="${viewName}"]`);
   if (activeLink) {
     activeLink.classList.remove('text-slate-300');
-    activeLink.classList.add('text-amber-400', 'border-b-2', 'border-amber-400');
+    activeLink.classList.add('text-[#4cd7f6]', 'bg-cyan-950/40', 'border', 'border-cyan-500/30', 'shadow-sm');
   }
 
   if (viewName === 'map' && mapInstance) {
@@ -978,7 +1048,7 @@ function highlightKeywordInLine(line, keyword) {
   const regex = new RegExp(`(${safeKw})`, 'gi');
   return safeLine.replace(
     regex,
-    '<mark class="bg-amber-400 text-slate-950 font-bold px-1 py-0.5 rounded shadow-sm">$1</mark>'
+    '<mark class="bg-[#06b6d4] text-[#00252e] font-bold px-1.5 py-0.5 rounded shadow-sm">$1</mark>'
   );
 }
 
@@ -1054,43 +1124,43 @@ function renderQuotedAnnouncementSection(rawText, sourceUrl, uniqueId, searchKey
     targetQuote && targetQuote.keyword
       ? `<button type="button" onclick="copyToClipboard('${escapeHtml(
           targetQuote.keyword
-        )}', this)" class="text-[11px] px-2 py-0.5 rounded bg-sky-950 hover:bg-sky-900 text-sky-300 border border-sky-700/70 transition font-medium">
+        )}', this)" class="text-[11px] px-2.5 py-1 rounded-lg bg-cyan-950/80 hover:bg-cyan-900 text-[#4cd7f6] border border-cyan-500/40 transition font-medium shadow-sm">
            📋 Copy "${escapeHtml(targetQuote.keyword)}"
          </button>`
       : '';
 
   const embedControls = sourceUrl
     ? `
-      <div class="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-xs">
-        <a href="${directLink}" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:text-sky-300 underline font-semibold flex items-center gap-1">
+      <div class="mt-2.5 pt-2 border-t border-white/[0.08] flex items-center justify-between text-xs">
+        <a href="${directLink}" target="_blank" rel="noopener noreferrer" class="text-[#4cd7f6] hover:underline font-semibold flex items-center gap-1">
           <span>Open in Telegram ↗</span>
         </a>
-        <button id="${btnId}" type="button" onclick="toggleEmbedIframe('${embedId}', '${sourceUrl}', '${btnId}')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-medium transition">
+        <button id="${btnId}" type="button" onclick="toggleEmbedIframe('${embedId}', '${sourceUrl}', '${btnId}')" class="px-2.5 py-1 rounded-lg bg-[#1f1f21] hover:bg-[#2a2a2c] text-[#ffb873] border border-white/10 font-medium transition">
           ${t('show_embed')}
         </button>
       </div>
       <div id="${embedId}" class="hidden pt-2">
         <iframe src="" data-src="${
           sourceUrl.includes('?') ? sourceUrl + '&embed=1' : sourceUrl + '?embed=1'
-        }" class="w-full h-64 rounded-xl border border-slate-700/80 bg-slate-900" frameborder="0" loading="lazy"></iframe>
+        }" class="w-full h-64 rounded-xl border border-white/[0.1] bg-[#161618]" frameborder="0" loading="lazy"></iframe>
       </div>
     `
     : '';
 
   return `
-    <div class="mt-3 bg-slate-900/90 border border-slate-700/90 rounded-xl p-3 space-y-2">
+    <div class="mt-3 bg-[#0e0e10] border border-white/[0.08] rounded-xl p-3.5 space-y-2.5">
       <div class="flex items-center justify-between">
-        <span class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+        <span class="text-xs font-bold text-[#ffb873] flex items-center gap-1.5">
           <span>🎯</span>
           <span>${t('quoted_specific_point')}</span>
         </span>
         ${copyKeywordBtn}
       </div>
 
-      <div class="text-xs text-slate-200 border-l-2 border-amber-400 pl-3 py-1 font-mono whitespace-pre-line leading-relaxed bg-slate-950/60 rounded-r-lg">
+      <div class="text-xs text-slate-200 border-l-2 border-[#06b6d4] pl-3 py-1 font-mono whitespace-pre-line leading-relaxed bg-[#161618] rounded-r-lg">
         ${
           targetQuote && targetQuote.timeHeader
-            ? `<div class="text-amber-400 font-bold mb-1">${escapeHtml(targetQuote.timeHeader)}</div>`
+            ? `<div class="text-[#4cd7f6] font-bold mb-1">${escapeHtml(targetQuote.timeHeader)}</div>`
             : ''
         }
         <div class="text-slate-100">${
@@ -1098,11 +1168,11 @@ function renderQuotedAnnouncementSection(rawText, sourceUrl, uniqueId, searchKey
         }</div>
       </div>
 
-      <details class="group text-[11px] text-slate-400">
+      <details class="group text-[11px] text-[#869397]">
         <summary class="cursor-pointer select-none text-slate-400 hover:text-slate-300 font-medium">
           <span>${t('view_full_announcement')} ▾</span>
         </summary>
-        <blockquote class="mt-1.5 text-[11px] text-slate-300 border-l border-slate-700 pl-2.5 py-1 font-mono whitespace-pre-line max-h-32 overflow-y-auto leading-relaxed bg-slate-950/40 rounded-r">
+        <blockquote class="mt-1.5 text-[11px] text-slate-300 border-l border-white/10 pl-2.5 py-1 font-mono whitespace-pre-line max-h-32 overflow-y-auto leading-relaxed bg-[#161618] rounded-r">
 ${escapedFullText}
         </blockquote>
       </details>
@@ -1133,19 +1203,19 @@ function renderLandmarkPins() {
         <div class="landmark-pulse-ring"></div>
         <div class="landmark-pulse-dot"></div>
       </div>`,
-      iconSize: [24, 24],
-      iconAnchor: [12, 12],
+      iconSize: [26, 26],
+      iconAnchor: [13, 13],
       popupAnchor: [0, -10],
     });
 
     // Outer 350m radius zone circle indicating localized affected perimeter
     const radiusCircle = L.circle([pin.lat, pin.lng], {
       radius: 350,
-      color: '#f59e0b',
+      color: '#06b6d4',
       weight: 1.5,
       dashArray: '4, 4',
-      fillColor: '#f59e0b',
-      fillOpacity: 0.12,
+      fillColor: '#06b6d4',
+      fillOpacity: 0.14,
       interactive: false,
     });
     landmarkPinsLayer.addLayer(radiusCircle);
@@ -1155,7 +1225,7 @@ function renderLandmarkPins() {
 
     // Tooltip on hover
     marker.bindTooltip(
-      `<div class="font-bold text-xs text-amber-400">📍 ${escapeHtml(name)}</div>
+      `<div class="font-bold text-xs text-[#4cd7f6]">📍 ${escapeHtml(name)}</div>
        <div class="text-[11px] text-slate-300">${escapeHtml(subcityName)} • Woreda ${escapeHtml(woredaNum)}</div>`,
       { direction: 'top', offset: [0, -10], className: 'leaflet-dark-tooltip' }
     );
@@ -1171,47 +1241,47 @@ function renderLandmarkPins() {
     const targetQuote = pin.raw_text ? extractTargetQuote(pin.raw_text, searchKeywords) : null;
 
     const popupHtml = `
-      <div class="p-1 space-y-2 text-slate-100 min-w-[220px] max-w-[280px]">
-        <div class="flex items-start justify-between border-b border-slate-700/80 pb-1.5">
+      <div class="p-1.5 space-y-2 text-slate-100 min-w-[230px] max-w-[290px] font-sans">
+        <div class="flex items-start justify-between border-b border-white/10 pb-1.5">
           <div>
-            <div class="text-xs font-bold text-amber-400 flex items-center gap-1">
+            <div class="text-xs font-bold text-[#4cd7f6] flex items-center gap-1">
               <span>📍</span>
               <span>${escapeHtml(name)}</span>
             </div>
-            <div class="text-[11px] text-slate-400">${escapeHtml(subcityName)} • Woreda ${escapeHtml(woredaNum)}</div>
+            <div class="text-[11px] font-mono text-[#869397]">${escapeHtml(subcityName)} • Woreda ${escapeHtml(woredaNum)}</div>
           </div>
-          <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-600/60 font-semibold uppercase">
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-950/80 text-[#ffb873] border border-amber-600/60 font-semibold uppercase">
             ${t('legend_scheduled')}
           </span>
         </div>
 
         ${
           timeDisplay
-            ? `<div class="text-[11px] text-slate-300">
-                <span class="text-slate-400">🕒 ${t('time_label')}:</span> <span class="font-semibold text-white">${escapeHtml(timeDisplay)}</span>
+            ? `<div class="text-[11px] font-mono text-slate-300">
+                <span class="text-[#869397]">🕒 ${t('time_label')}:</span> <span class="font-semibold text-white">${escapeHtml(timeDisplay)}</span>
                </div>`
             : ''
         }
 
         ${
           targetQuote && targetQuote.highlightedLine
-            ? `<div class="text-[11px] text-slate-200 border-l-2 border-amber-400 pl-2 py-0.5 font-mono bg-slate-950/60 rounded-r text-xs">
+            ? `<div class="text-[11px] text-slate-200 border-l-2 border-[#06b6d4] pl-2 py-0.5 font-mono bg-[#0e0e10] rounded-r text-xs">
                 ${targetQuote.highlightedLine}
                </div>`
             : ''
         }
 
-        <div class="pt-1.5 border-t border-slate-700/80 flex flex-col gap-1.5">
+        <div class="pt-2 border-t border-white/10 flex flex-col gap-1.5">
           ${
             pin.woreda_id
-              ? `<button type="button" onclick="openWoredaModal(${pin.woreda_id})" class="w-full text-center py-1 px-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition">
+              ? `<button type="button" onclick="openWoredaModal(${pin.woreda_id})" class="w-full text-center py-1.5 px-3 rounded-lg btn-electric text-xs font-bold transition shadow-sm">
                   ${t('view_details_btn')}
                  </button>`
               : ''
           }
           ${
             pin.source_url
-              ? `<a href="${pin.source_url}" target="_blank" rel="noopener noreferrer" class="text-center text-[11px] text-sky-400 hover:text-sky-300 underline font-medium">
+              ? `<a href="${pin.source_url}" target="_blank" rel="noopener noreferrer" class="text-center text-[11px] text-[#4cd7f6] hover:underline font-medium">
                   Open Telegram Post ↗
                  </a>`
               : ''
@@ -1258,7 +1328,7 @@ function renderOutagesList() {
   }
 
   if (filtered.length === 0) {
-    container.innerHTML = `<div class="p-8 text-center text-slate-400 bg-slate-800/40 rounded-xl border border-slate-700">${t(
+    container.innerHTML = `<div class="p-8 text-center text-slate-400 amsale-card font-mono text-xs">${t(
       isHistory ? 'no_history_outages' : 'no_upcoming_outages'
     )}</div>`;
     return;
@@ -1304,68 +1374,68 @@ function renderOutagesList() {
       const reason = currentLang === 'am' ? o.reason_am || o.reason : o.reason;
 
       const sourceBtn = o.source_url
-        ? `<a href="${o.source_url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-sky-950/80 hover:bg-sky-900 border border-sky-700/60 text-sky-300 text-xs font-semibold transition">
-             <span>Telegram Announcement</span>
+        ? `<a href="${o.source_url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#1f1f21] hover:bg-[#2a2a2c] border border-white/10 text-[#4cd7f6] text-xs font-semibold transition">
+             <span>Telegram Post</span>
              <span>↗</span>
            </a>`
         : '';
 
       const statusBadge = isHistory
-        ? `<span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-950/70 text-emerald-300 border border-emerald-700/60">
+        ? `<span class="px-2.5 py-1 text-xs font-mono font-semibold rounded-full bg-emerald-950/70 text-emerald-300 border border-emerald-700/60 shadow-sm">
              ✅ ${t('status_concluded')}
            </span>`
-        : `<span class="px-2.5 py-1 text-xs font-semibold rounded-full ${
+        : `<span class="px-2.5 py-1 text-xs font-mono font-semibold rounded-full ${
             isScheduled
-              ? 'bg-amber-900/60 text-amber-300 border border-amber-700/60'
-              : 'bg-red-900/60 text-red-300 border border-red-700/60'
-          }">
+              ? 'bg-amber-950/70 text-[#ffb873] border border-amber-600/60'
+              : 'bg-rose-950/70 text-rose-300 border border-rose-600/60'
+          } shadow-sm">
             ${getStatusLabel(o.status)}
           </span>`;
 
       return `
-      <div class="p-5 bg-slate-800/60 rounded-xl border border-slate-700/80 hover:border-slate-600 transition shadow-lg ${isHistory ? 'opacity-95' : ''}">
+      <div class="amsale-card p-5 transition shadow-lg ${isHistory ? 'opacity-90' : ''}">
         <div class="flex flex-wrap items-start justify-between gap-2 mb-3">
           <div class="flex flex-wrap items-center gap-2">
             ${statusBadge}
-            <span class="px-2 py-0.5 rounded text-xs font-semibold ${
+            <span class="px-2.5 py-0.5 rounded text-xs font-mono font-medium ${
               isAddis
-                ? 'bg-sky-950 text-sky-300 border border-sky-800'
-                : 'bg-indigo-950 text-indigo-300 border border-indigo-800'
+                ? 'bg-cyan-950/80 text-[#4cd7f6] border border-cyan-500/30'
+                : 'bg-blue-950/80 text-blue-300 border border-blue-500/30'
             }">
               ${o.region_name || 'Addis Ababa'}
             </span>
-            <span class="text-xs text-slate-400">Confidence: <strong>${o.confidence}</strong></span>
-            ${isHistory ? `<span class="text-[11px] px-2 py-0.5 rounded bg-slate-800/80 text-slate-400 border border-slate-700">Archived Record</span>` : ''}
+            <span class="text-xs font-mono text-[#869397]">CONFIDENCE: <strong class="text-slate-200">${o.confidence}</strong></span>
+            ${isHistory ? `<span class="text-[11px] px-2 py-0.5 rounded bg-[#1f1f21] text-slate-400 font-mono border border-white/10">ARCHIVED</span>` : ''}
           </div>
-          ${sourceBtn || `<span class="text-xs text-slate-400">${t('source_official')}</span>`}
+          ${sourceBtn || `<span class="text-xs font-mono text-[#869397]">${t('source_official')}</span>`}
         </div>
 
-        <div class="mb-3 px-3 py-2 rounded-lg bg-slate-900/80 border border-slate-700/60 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div class="mb-3 px-3.5 py-2.5 rounded-xl bg-[#0e0e10] border border-white/[0.08] flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
           <div class="flex items-center gap-2">
-            <span class="text-amber-400 font-bold">📅 ${ethDateLabel}</span>
-            <span class="text-slate-400">(${gregDateStr})</span>
+            <span class="text-[#ffb873] font-bold">📅 ${ethDateLabel}</span>
+            <span class="text-[#869397]">(${gregDateStr})</span>
           </div>
           <div class="flex items-center gap-2 text-slate-300">
             <span class="text-white font-semibold">🕒 ${isHistory ? 'Concluded: ' : ''}${ethTimeDisplay || 'TBD'}</span>
-            <span class="text-slate-400 text-[11px]">(${civilTimeDisplay})</span>
+            <span class="text-[#869397] text-[11px]">(${civilTimeDisplay})</span>
           </div>
         </div>
 
-        <div class="font-bold text-base text-white mb-1">${displayLocation}</div>
+        <div class="font-bold text-base text-white mb-1 tracking-tight">${displayLocation}</div>
         <div class="text-sm text-slate-300 mb-3">${reason || 'Maintenance Work'}</div>
-        <div class="text-xs text-slate-400 flex flex-wrap items-center gap-4">
+        <div class="text-xs font-mono text-[#869397] flex flex-wrap items-center gap-4">
           ${areas.length > 0 ? `<span>📍 ${areas.length} Woreda(s) affected</span>` : `<span>📍 Regional Town / Grid Substation</span>`}
           ${isHistory && o.scheduled_end ? `<span>🏁 Concluded at ${civilTimeDisplay.split('–')[1] || civilTimeDisplay}</span>` : ''}
         </div>
         ${
           Array.isArray(o.landmarks) && o.landmarks.length > 0
             ? `<div class="mt-2.5 flex flex-wrap items-center gap-1.5">
-                <span class="text-[11px] font-semibold text-amber-400">📍 ${t('pinpoint_title')}:</span>
+                <span class="text-[11px] font-semibold text-[#ffb873]">📍 ${t('pinpoint_title')}:</span>
                 ${o.landmarks
                   .map((lm) => {
                     const lmName = currentLang === 'am' ? (lm.name_am || lm.name_en) : (lm.name_en || lm.name_am);
-                    return `<button type="button" onclick="zoomToLandmark(${lm.lat}, ${lm.lng}, '${escapeHtml(lmName)}')" class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-amber-950/70 hover:bg-amber-900 border border-amber-600/60 text-amber-300 transition font-medium shadow-sm">
-                      <span>📍</span><span>${escapeHtml(lmName)}</span><span class="text-[10px] text-amber-400">🎯</span>
+                    return `<button type="button" onclick="zoomToLandmark(${lm.lat}, ${lm.lng}, '${escapeHtml(lmName)}')" class="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/40 text-[#4cd7f6] transition font-medium shadow-sm">
+                      <span>📍</span><span>${escapeHtml(lmName)}</span><span class="text-[10px] text-cyan-300">🎯</span>
                     </button>`;
                   })
                   .join('')}
@@ -1394,7 +1464,7 @@ function renderCalendar() {
   const scheduled = allOutages.filter((o) => o.status === 'SCHEDULED' || o.scheduled_start);
 
   if (scheduled.length === 0) {
-    container.innerHTML = `<div class="p-8 text-center text-slate-400 bg-slate-800/40 rounded-xl border border-slate-700">${t(
+    container.innerHTML = `<div class="p-8 text-center text-slate-400 amsale-card font-mono text-xs">${t(
       'no_upcoming_outages'
     )}</div>`;
   } else {
@@ -1430,31 +1500,31 @@ function renderCalendar() {
             const displayArea = areas || rawLocs || s.region_name || 'Addis Ababa';
 
             return `
-            <div class="p-5 bg-slate-800/60 rounded-xl border border-slate-700 flex flex-col justify-between shadow-md">
+            <div class="amsale-card p-5 flex flex-col justify-between shadow-md">
               <div>
-                <div class="flex items-center justify-between mb-1.5">
-                  <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">📅 ${ethDateLabel}</span>
-                  <span class="text-[11px] px-2 py-0.5 rounded font-semibold bg-slate-800 text-slate-300 border border-slate-700">${s.region_name || 'Addis Ababa'}</span>
+                <div class="flex items-center justify-between mb-1.5 font-mono">
+                  <span class="text-xs font-bold text-[#ffb873] uppercase tracking-wider">📅 ${ethDateLabel}</span>
+                  <span class="text-[11px] px-2 py-0.5 rounded font-semibold bg-[#1f1f21] text-[#4cd7f6] border border-white/10">${s.region_name || 'Addis Ababa'}</span>
                 </div>
-                <div class="text-xs text-slate-400 mb-2.5">Gregorian: ${dateStr}</div>
+                <div class="text-xs text-[#869397] font-mono mb-2.5">Gregorian: ${dateStr}</div>
 
-                <div class="text-base font-bold text-white mb-0.5">🕒 ${ethTimeDisplay}</div>
-                <div class="text-xs text-slate-400 mb-3">24-Hour Civil: ${civilTimeDisplay}</div>
+                <div class="text-base font-bold text-white mb-0.5 font-mono">🕒 ${ethTimeDisplay}</div>
+                <div class="text-xs font-mono text-[#869397] mb-3">24-Hour Civil: ${civilTimeDisplay}</div>
 
-                <div class="text-sm text-slate-200 mb-2"><strong>Affected:</strong> ${displayArea}</div>
+                <div class="text-sm text-slate-200 mb-2 font-medium"><strong>Affected:</strong> ${displayArea}</div>
                 <div class="text-xs text-slate-400">${
                   currentLang === 'am' ? s.reason_am || s.reason : s.reason || 'Maintenance'
                 }</div>
               </div>
               ${
                 Array.isArray(s.landmarks) && s.landmarks.length > 0
-                  ? `<div class="mt-2 mb-1 flex flex-wrap items-center gap-1.5">
-                      <span class="text-[11px] font-semibold text-amber-400">📍 ${t('pinpoint_title')}:</span>
+                  ? `<div class="mt-2.5 mb-1 flex flex-wrap items-center gap-1.5">
+                      <span class="text-[11px] font-semibold text-[#ffb873]">📍 ${t('pinpoint_title')}:</span>
                       ${s.landmarks
                         .map((lm) => {
                           const lmName = currentLang === 'am' ? (lm.name_am || lm.name_en) : (lm.name_en || lm.name_am);
-                          return `<button type="button" onclick="zoomToLandmark(${lm.lat}, ${lm.lng}, '${escapeHtml(lmName)}')" class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-amber-950/70 hover:bg-amber-900 border border-amber-600/60 text-amber-300 transition font-medium shadow-sm">
-                            <span>📍</span><span>${escapeHtml(lmName)}</span><span class="text-[10px] text-amber-400">🎯</span>
+                          return `<button type="button" onclick="zoomToLandmark(${lm.lat}, ${lm.lng}, '${escapeHtml(lmName)}')" class="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/40 text-[#4cd7f6] transition font-medium shadow-sm">
+                            <span>📍</span><span>${escapeHtml(lmName)}</span><span class="text-[10px] text-cyan-300">🎯</span>
                           </button>`;
                         })
                         .join('')}
@@ -1469,8 +1539,8 @@ function renderCalendar() {
                 ].filter(Boolean);
                 return renderQuotedAnnouncementSection(s.raw_text, s.source_url, `cal-${s.id}`, calKeywords);
               })()}
-              <div class="mt-4 pt-3 border-t border-slate-700/60 flex items-center justify-between text-xs text-slate-400">
-                ${s.source_url ? `<a href="${s.source_url}" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:text-sky-300 font-semibold underline flex items-center gap-1"><span>Telegram Post</span><span>↗</span></a>` : `<span>Source: EEU Official</span>`}
+              <div class="mt-4 pt-3 border-t border-white/[0.08] flex items-center justify-between text-xs text-[#869397] font-mono">
+                ${s.source_url ? `<a href="${s.source_url}" target="_blank" rel="noopener noreferrer" class="text-[#4cd7f6] hover:underline font-semibold flex items-center gap-1"><span>Telegram Post</span><span>↗</span></a>` : `<span>Source: EEU Official</span>`}
                 <span class="text-emerald-400">Scheduled Ahead</span>
               </div>
             </div>
@@ -1492,7 +1562,7 @@ function renderCalendarHistory() {
   if (!container) return;
 
   if (!historyOutages || historyOutages.length === 0) {
-    container.innerHTML = `<div class="col-span-full p-6 text-center text-slate-400 bg-slate-800/40 rounded-xl border border-slate-700">${t('no_history_outages')}</div>`;
+    container.innerHTML = `<div class="col-span-full p-6 text-center text-slate-400 amsale-card font-mono text-xs">${t('no_history_outages')}</div>`;
     return;
   }
 
@@ -1524,14 +1594,14 @@ function renderCalendarHistory() {
       const displayArea = areas || rawLocs || s.region_name || 'Addis Ababa';
 
       return `
-        <div class="p-4 bg-slate-800/40 rounded-xl border border-slate-700/60 flex flex-col justify-between shadow opacity-90 hover:opacity-100 transition">
+        <div class="amsale-card p-4 flex flex-col justify-between shadow opacity-90 hover:opacity-100 transition">
           <div>
-            <div class="flex items-center justify-between mb-1.5">
+            <div class="flex items-center justify-between mb-1.5 font-mono">
               <span class="text-xs font-bold text-slate-300">📅 ${ethDateLabel}</span>
               <span class="text-[10px] px-2 py-0.5 rounded font-semibold bg-emerald-950/70 text-emerald-300 border border-emerald-800">✅ ${t('status_concluded')}</span>
             </div>
-            <div class="text-[11px] text-slate-400 mb-2">Gregorian: ${dateStr}</div>
-            <div class="text-xs text-slate-300 mb-1">🕒 Concluded: <strong>${ethTimeDisplay}</strong> (${civilTimeDisplay})</div>
+            <div class="text-[11px] font-mono text-[#869397] mb-2">Gregorian: ${dateStr}</div>
+            <div class="text-xs font-mono text-slate-300 mb-1">🕒 Concluded: <strong>${ethTimeDisplay}</strong> (${civilTimeDisplay})</div>
             <div class="text-xs text-white font-medium mb-1">${displayArea}</div>
             <div class="text-[11px] text-slate-400">${currentLang === 'am' ? s.reason_am || s.reason : s.reason || 'Maintenance'}</div>
           </div>
@@ -1543,8 +1613,8 @@ function renderCalendarHistory() {
             ].filter(Boolean);
             return renderQuotedAnnouncementSection(s.raw_text, s.source_url, `hist-${s.id}`, histKeywords);
           })()}
-          <div class="mt-3 pt-2 border-t border-slate-700/40 flex items-center justify-between text-[11px] text-slate-400">
-            ${s.source_url ? `<a href="${s.source_url}" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:text-sky-300 underline flex items-center gap-1"><span>Telegram</span><span>↗</span></a>` : `<span>EEU Official</span>`}
+          <div class="mt-3 pt-2 border-t border-white/[0.08] flex items-center justify-between text-[11px] font-mono text-[#869397]">
+            ${s.source_url ? `<a href="${s.source_url}" target="_blank" rel="noopener noreferrer" class="text-[#4cd7f6] hover:underline flex items-center gap-1"><span>Telegram</span><span>↗</span></a>` : `<span>EEU Official</span>`}
             <span class="text-slate-500 font-mono text-[10px]">CAPPED HISTORY</span>
           </div>
         </div>
@@ -1569,10 +1639,10 @@ function renderAreasDirectory() {
   container.innerHTML = Array.from(bySubcity.entries())
     .map(([subcity, woredas]) => {
       return `
-      <div class="p-5 bg-slate-800/50 rounded-xl border border-slate-700/80 mb-4">
+      <div class="amsale-card p-5 mb-4">
         <h3 class="text-base font-bold text-white mb-3 flex items-center justify-between">
           <span>${subcity}</span>
-          <span class="text-xs font-normal text-slate-400">${woredas.length} Woredas</span>
+          <span class="text-xs font-mono font-normal text-[#869397]">${woredas.length} Woredas</span>
         </h3>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
           ${woredas
@@ -1581,12 +1651,12 @@ function renderAreasDirectory() {
               const name = currentLang === 'am' ? `ወረዳ ${p.woreda_num}` : `Woreda ${p.woreda_num}`;
               const st = woredaStatusMap.get(p.woreda_id)?.current_status || 'NORMAL';
               return `
-              <button class="p-2 text-left rounded-lg bg-slate-900/60 hover:bg-slate-700/60 border border-slate-700/40 text-xs flex items-center justify-between woreda-card-btn" data-wid="${
+              <button class="p-2.5 text-left rounded-xl bg-[#1f1f21] hover:bg-[#2a2a2c] hover:border-cyan-500/40 border border-white/[0.08] text-xs flex items-center justify-between woreda-card-btn transition" data-wid="${
                 p.woreda_id
               }">
                 <span class="text-slate-200 font-medium">${name}</span>
                 <span class="w-2 h-2 rounded-full ${
-                  st === 'NORMAL' ? 'bg-emerald-400' : st === 'SCHEDULED' ? 'bg-amber-400' : 'bg-red-400'
+                  st === 'NORMAL' ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]' : st === 'SCHEDULED' ? 'bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.8)]' : 'bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.8)]'
                 }"></span>
               </button>
             `;
@@ -1754,40 +1824,40 @@ async function renderAdminQueue() {
         const raw = item.raw_announcements;
         const ext = item.extracted_json || {};
         return `
-        <div class="p-5 bg-slate-800/80 rounded-xl border border-slate-700 shadow-md mb-4">
-          <div class="flex items-start justify-between mb-3">
-            <span class="text-xs px-2 py-0.5 rounded-full bg-amber-900/60 text-amber-300 border border-amber-700">
-              Confidence: ${item.confidence_score}%
+        <div class="amsale-card p-5 mb-4 shadow-md">
+          <div class="flex items-start justify-between mb-3 font-mono">
+            <span class="text-xs px-2.5 py-0.5 rounded-full bg-amber-950/80 text-[#ffb873] border border-amber-600/60 font-semibold">
+              CONFIDENCE: ${item.confidence_score}%
             </span>
-            <span class="text-xs text-slate-400">${new Date(raw.published_at).toLocaleString()}</span>
+            <span class="text-xs text-[#869397]">${new Date(raw.published_at).toLocaleString()}</span>
           </div>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div class="p-3 bg-slate-900/60 rounded-lg border border-slate-800">
-              <div class="text-xs font-semibold text-slate-400 uppercase mb-1">Original EEU Announcement (Amharic)</div>
-              <div class="text-sm text-slate-200 font-serif leading-relaxed">${raw.raw_text}</div>
+            <div class="p-3.5 bg-[#0e0e10] rounded-xl border border-white/[0.08]">
+              <div class="text-[11px] font-semibold text-[#869397] uppercase tracking-wider mb-1.5 font-mono">Original EEU Announcement (Amharic)</div>
+              <div class="text-sm text-slate-200 leading-relaxed font-sans">${escapeHtml(raw.raw_text)}</div>
             </div>
             
-            <div class="p-3 bg-slate-900/60 rounded-lg border border-slate-800 text-xs text-slate-300 space-y-1.5">
-              <div class="font-semibold text-slate-400 uppercase mb-1">Deterministic Extracted Fields</div>
-              <div><strong>Sub-city:</strong> ${ext.sub_city_en || 'Unknown'} (${ext.sub_city_am || 'ያልታወቀ'})</div>
-              <div><strong>Woredas:</strong> ${
-                ext.woredas && ext.woredas.length > 0 ? ext.woredas.join(', ') : 'None extracted'
+            <div class="p-3.5 bg-[#0e0e10] rounded-xl border border-white/[0.08] text-xs text-slate-300 space-y-2 font-mono">
+              <div class="text-[11px] font-semibold text-[#869397] uppercase tracking-wider mb-1.5">Deterministic Extracted Fields</div>
+              <div><strong class="text-[#4cd7f6]">Sub-city:</strong> ${escapeHtml(ext.sub_city_en || 'Unknown')} (${escapeHtml(ext.sub_city_am || 'ያልታወቀ')})</div>
+              <div><strong class="text-[#4cd7f6]">Woredas:</strong> ${
+                ext.woredas && ext.woredas.length > 0 ? ext.woredas.map(escapeHtml).join(', ') : 'None extracted'
               }</div>
-              <div><strong>Time Range:</strong> ${ext.start_time_raw || 'N/A'} – ${
-          ext.expected_restoration_time_raw || 'N/A'
+              <div><strong class="text-[#4cd7f6]">Time Range:</strong> ${escapeHtml(ext.start_time_raw || 'N/A')} – ${
+          escapeHtml(ext.expected_restoration_time_raw || 'N/A')
         }</div>
-              <div><strong>Reason:</strong> ${ext.reason_en || 'Maintenance'}</div>
+              <div><strong class="text-[#4cd7f6]">Reason:</strong> ${escapeHtml(ext.reason_en || 'Maintenance')}</div>
             </div>
           </div>
 
-          <div class="flex items-center justify-end gap-3 pt-2 border-t border-slate-700/60">
-            <button class="px-4 py-1.5 rounded-lg bg-red-900/60 hover:bg-red-800/80 text-red-200 text-xs font-medium border border-red-700" onclick="reviewExtraction('${
+          <div class="flex items-center justify-end gap-3 pt-3 border-t border-white/[0.08]">
+            <button class="px-4 py-2 rounded-xl bg-rose-950/70 hover:bg-rose-900 text-rose-300 text-xs font-semibold border border-rose-700/60 transition" onclick="reviewExtraction('${
               item.id
             }', 'REJECTED')">
               Reject
             </button>
-            <button class="px-4 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-medium shadow" onclick="reviewExtraction('${
+            <button class="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold shadow-md transition" onclick="reviewExtraction('${
               item.id
             }', 'APPROVED')">
               Approve & Create Outage
@@ -1798,7 +1868,7 @@ async function renderAdminQueue() {
       })
       .join('');
   } catch (err) {
-    container.innerHTML = `<div class="text-red-400">Failed to load admin extractions.</div>`;
+    container.innerHTML = `<div class="text-rose-400 p-4 font-mono text-xs">Failed to load admin extractions.</div>`;
   }
 }
 

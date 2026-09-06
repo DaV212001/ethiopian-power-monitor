@@ -1,77 +1,172 @@
-/* Custom Styles & Map Overrides for Ethiopian Power Monitor */
+/* ==========================================================================
+   Amsale Monitoring System — Design System Stylesheet
+   Premium Dark Modernism for Ethiopian Power Monitor
+   ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600;700&display=swap');
+
+:root {
+  --surface: #0a0a0b;
+  --surface-card: #161618;
+  --surface-container-low: #1b1b1d;
+  --surface-container: #1f1f21;
+  --surface-container-high: #2a2a2c;
+  --surface-container-highest: #353437;
+  
+  --on-surface: #e4e2e4;
+  --on-surface-variant: #bcc9cd;
+  --outline: #869397;
+  --outline-variant: #3d494c;
+  
+  --primary-cyan: #06b6d4;
+  --primary-cyan-bright: #4cd7f6;
+  --primary-cyan-glow: rgba(6, 182, 212, 0.25);
+  
+  --accent-blue: #3b82f6;
+  --accent-blue-hover: #2563eb;
+  
+  --status-emerald: #22c55e;
+  --status-amber: #f59e0b;
+  --status-amber-bright: #ffb873;
+  --status-crimson: #ef4444;
+  
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.14);
+}
 
 body {
   font-family: 'Inter', 'Noto Sans Ethiopic', sans-serif;
+  background-color: var(--surface);
+  color: var(--on-surface);
+  letter-spacing: -0.01em;
 }
 
+/* Monospaced Telemetry & Numbers */
+.font-mono, 
+.telemetry-num, 
+.telemetry-date, 
+.data-mono {
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* Glassmorphism & Tonal Layering */
+.glass-surface {
+  background: rgba(22, 22, 24, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-subtle);
+}
+
+.glass-nav {
+  background: rgba(15, 15, 17, 0.90);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.glass-modal {
+  background: rgba(22, 22, 24, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85), 0 0 35px rgba(6, 182, 212, 0.15);
+}
+
+/* Card Surface Styling */
+.amsale-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.amsale-card:hover {
+  border-color: rgba(6, 182, 212, 0.35);
+  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.6), 0 0 16px rgba(6, 182, 212, 0.1);
+}
+
+/* Interactive Map Container */
 #map {
   width: 100%;
-  height: 540px;
-  background-color: #0b1120;
-  border-radius: 0.75rem;
+  height: 560px;
+  background-color: #0b0e14;
+  border-radius: 10px;
   z-index: 10;
 }
 
 @media (max-width: 768px) {
   #map {
-    height: 380px;
+    height: 400px;
   }
 }
 
-/* Leaflet dark theme tweaks */
+/* Leaflet Dark Modernism Theme Overrides */
 .leaflet-container {
-  background: #0f172a !important;
+  background: #0a0c10 !important;
+  font-family: inherit;
 }
 
 .leaflet-popup-content-wrapper {
-  background: #1e293b !important;
-  color: #f8fafc !important;
-  border-radius: 0.5rem !important;
-  border: 1px solid #334155 !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+  background: rgba(22, 22, 24, 0.95) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #f1f5f9 !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.8), 0 0 15px rgba(6, 182, 212, 0.15) !important;
+  padding: 4px;
 }
 
 .leaflet-popup-tip {
-  background: #1e293b !important;
+  background: #161618 !important;
 }
 
-/* Pulsing radar dot for active outages */
-.pulse-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  animation: pulse-ring 1.8s infinite;
+.leaflet-bar {
+  border: 1px solid var(--border-subtle) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
 }
 
-@keyframes pulse-ring {
-  0% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-  }
-  70% {
-    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-  }
+.leaflet-bar a {
+  background-color: rgba(22, 22, 24, 0.9) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  color: #e4e2e4 !important;
 }
 
-/* Custom scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+.leaflet-bar a:hover {
+  background-color: #2a2a2c !important;
+  color: #4cd7f6 !important;
 }
-::-webkit-scrollbar-track {
-  background: #0f172a;
+
+/* Dark styled Leaflet Layer Switcher Control */
+.leaflet-control-layers {
+  background: rgba(22, 22, 24, 0.92) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 10px !important;
+  color: #e4e2e4 !important;
+  font-family: inherit;
+  font-size: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
 }
-::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 3px;
+
+.leaflet-control-layers-expanded {
+  padding: 10px 14px !important;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+
+.leaflet-control-layers-toggle {
+  filter: invert(1) brightness(0.9);
+}
+
+.leaflet-control-layers label {
+  margin-bottom: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
 }
 
 /* Sub-Woreda Landmark Pinpoint Pulsing Marker */
@@ -82,8 +177,8 @@ body {
 
 .landmark-pulse-container {
   position: relative;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -92,28 +187,29 @@ body {
 
 .landmark-pulse-ring {
   position: absolute;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background-color: rgba(245, 158, 11, 0.35);
-  border: 2px solid rgba(245, 158, 11, 0.85);
+  background-color: rgba(6, 182, 212, 0.3);
+  border: 2px solid rgba(76, 215, 246, 0.85);
   animation: landmark-pulse-animation 2s cubic-bezier(0.2, 0, 0, 1) infinite;
 }
 
 .landmark-pulse-dot {
   position: relative;
-  width: 10px;
-  height: 10px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
-  background: #f59e0b;
-  border: 2px solid #090d16;
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.95);
-  transition: transform 0.2s ease;
+  background: #06b6d4;
+  border: 2px solid #0a0a0b;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.95);
+  transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
 .landmark-pulse-container:hover .landmark-pulse-dot {
-  transform: scale(1.3);
-  background: #fbbf24;
+  transform: scale(1.35);
+  background: #4cd7f6;
+  box-shadow: 0 0 16px rgba(76, 215, 246, 1);
 }
 
 @keyframes landmark-pulse-animation {
@@ -122,36 +218,126 @@ body {
     opacity: 1;
   }
   100% {
-    transform: scale(2.2);
+    transform: scale(2.4);
     opacity: 0;
   }
 }
 
-/* Dark styled Leaflet layer switcher control */
-.leaflet-control-layers {
-  background: rgba(15, 23, 42, 0.92) !important;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(51, 65, 85, 0.8) !important;
-  border-radius: 12px !important;
-  color: #f1f5f9 !important;
-  font-family: inherit;
-  font-size: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+/* Animated LED Pings & Status Blooms */
+.led-dot {
+  position: relative;
+  display: inline-flex;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 }
 
-.leaflet-control-layers-expanded {
-  padding: 8px 12px !important;
+.led-dot::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  animation: led-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
-.leaflet-control-layers-toggle {
-  filter: invert(1) brightness(0.9);
+.led-emerald {
+  background-color: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
+}
+.led-emerald::before {
+  background-color: rgba(34, 197, 94, 0.7);
 }
 
-.leaflet-control-layers label {
-  margin-bottom: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.led-amber {
+  background-color: #f59e0b;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
+}
+.led-amber::before {
+  background-color: rgba(245, 158, 11, 0.7);
+}
+
+.led-crimson {
+  background-color: #ef4444;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.85);
+}
+.led-crimson::before {
+  background-color: rgba(239, 68, 68, 0.7);
+}
+
+.led-cyan {
+  background-color: #06b6d4;
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.85);
+}
+.led-cyan::before {
+  background-color: rgba(6, 182, 212, 0.7);
+}
+
+@keyframes led-ping {
+  75%, 100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* Custom Sleek Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--surface-container-high);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--surface-container-highest);
+}
+
+/* Technical Button Styles */
+.btn-electric {
+  background: var(--accent-blue);
+  color: #ffffff;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+}
+.btn-electric:hover {
+  background: var(--accent-blue-hover);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5);
+}
+
+.btn-cyan {
+  background: var(--primary-cyan);
+  color: #00252e;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 10px rgba(6, 182, 212, 0.4);
+}
+.btn-cyan:hover {
+  background: var(--primary-cyan-bright);
+  box-shadow: 0 4px 16px rgba(76, 215, 246, 0.6);
+}
+
+.btn-ghost-dark {
+  background: var(--surface-container-low);
+  border: 1px solid var(--border-subtle);
+  color: var(--on-surface);
+  transition: all 0.2s ease;
+}
+.btn-ghost-dark:hover {
+  background: var(--surface-container);
+  border-color: var(--border-medium);
+  color: #ffffff;
+}
+
+/* Selection */
+::selection {
+  background: rgba(6, 182, 212, 0.35);
+  color: #ffffff;
 }
 

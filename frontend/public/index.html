@@ -15,11 +15,18 @@
       theme: {
         extend: {
           colors: {
-            brand: {
-              50: '#fefce8',
-              500: '#eab308',
-              600: '#ca8a04',
+            amsale: {
+              surface: '#0a0a0b',
+              card: '#161618',
+              container: '#1f1f21',
+              cyan: '#06b6d4',
+              'cyan-bright': '#4cd7f6',
+              electric: '#3b82f6',
             }
+          },
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans Ethiopic', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
           }
         }
       }
@@ -32,42 +39,83 @@
 
   <link rel="stylesheet" href="/styles.css">
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-slate-950">
+<body class="bg-[#0a0a0b] text-[#e4e2e4] min-h-screen flex flex-col antialiased selection:bg-cyan-500/30 selection:text-white">
 
-  <!-- Header & Navigation -->
-  <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+  <!-- Top Telemetry & Navigation Header -->
+  <header class="sticky top-0 z-50 glass-nav">
+    <!-- Top Telemetry Ribbon -->
+    <div class="border-b border-white/[0.06] px-4 sm:px-6 lg:px-8 py-1.5 hidden md:flex items-center justify-between text-[11px] font-mono text-[#869397]">
+      <div class="flex items-center gap-4">
+        <span class="inline-flex items-center gap-1.5 text-slate-300">
+          <span class="led-dot led-emerald"></span>
+          <span id="hudGridStatus" class="font-medium tracking-wider">GRID NOMINAL • 116 WOREDAS MONITORED</span>
+        </span>
+        <span class="text-white/20">•</span>
+        <span class="text-slate-400">POSTGIS WGS84 • EEU TELEGRAM ENGINE</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2">
+          <span class="text-[#4cd7f6]">EAT:</span>
+          <span id="hudTimeEat" class="text-white font-semibold">--:--:--</span>
+        </div>
+        <span class="text-white/20">•</span>
+        <div class="flex items-center gap-2">
+          <span class="text-amber-400">ETH:</span>
+          <span id="hudTimeEth" class="text-slate-200">--:--</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
       
       <!-- Brand Logo -->
-      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('map')">
-        <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xl font-bold shadow-sm">
+      <div class="flex items-center space-x-3 cursor-pointer select-none" onclick="switchView('map')">
+        <div class="w-10 h-10 rounded-xl bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-[#4cd7f6] text-xl font-bold shadow-[0_0_15px_rgba(6,182,212,0.25)]">
           ⚡
         </div>
         <div>
-          <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
-            <span data-i18n="brand_title">Ethiopian Power Monitor</span>
-            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">LIVE</span>
-          </h1>
-          <p class="text-[11px] text-slate-400 hidden sm:block" data-i18n="brand_sub">Addis Ababa Electricity Intelligence Platform</p>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-bold tracking-tight text-white" data-i18n="brand_title">
+              Ethiopian Power Monitor
+            </h1>
+            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+              LIVE
+            </span>
+          </div>
+          <p class="text-[11px] text-[#869397] hidden sm:block" data-i18n="brand_sub">
+            Addis Ababa & Regional Hubs Grid Intelligence
+          </p>
         </div>
       </div>
 
       <!-- Navigation Links -->
-      <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
-        <a href="#map" class="nav-link text-amber-400 border-b-2 border-amber-400 py-5 transition" data-view="map" data-i18n="nav_map">Live Map</a>
-        <a href="#outages" class="nav-link text-slate-300 hover:text-white py-5 transition" data-view="outages" data-i18n="nav_outages">Outages</a>
-        <a href="#calendar" class="nav-link text-slate-300 hover:text-white py-5 transition" data-view="calendar" data-i18n="nav_calendar">Calendar</a>
-        <a href="#areas" class="nav-link text-slate-300 hover:text-white py-5 transition" data-view="areas" data-i18n="nav_areas">Areas</a>
-        <a href="#admin" class="nav-link text-slate-300 hover:text-white py-5 transition" data-view="admin" data-i18n="nav_admin">Admin</a>
+      <nav class="hidden md:flex items-center space-x-1 font-medium text-sm">
+        <a href="#map" class="nav-link px-3.5 py-2 rounded-lg text-[#4cd7f6] bg-cyan-950/40 border border-cyan-500/30 transition shadow-sm" data-view="map" data-i18n="nav_map">
+          Live Map
+        </a>
+        <a href="#outages" class="nav-link px-3.5 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/[0.05] transition" data-view="outages" data-i18n="nav_outages">
+          Outages
+        </a>
+        <a href="#calendar" class="nav-link px-3.5 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/[0.05] transition" data-view="calendar" data-i18n="nav_calendar">
+          Calendar
+        </a>
+        <a href="#areas" class="nav-link px-3.5 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/[0.05] transition" data-view="areas" data-i18n="nav_areas">
+          Areas
+        </a>
+        <a href="#admin" class="nav-link px-3.5 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/[0.05] transition" data-view="admin" data-i18n="nav_admin">
+          Admin
+        </a>
       </nav>
 
-      <!-- Actions: Language & Report Button -->
-      <div class="flex items-center space-x-3">
-        <button id="langToggle" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition">
-          አማርኛ
+      <!-- Actions: Language & Report Outage Button -->
+      <div class="flex items-center space-x-2.5">
+        <button id="langToggle" class="px-3 py-1.5 rounded-lg bg-[#1f1f21] hover:bg-[#2a2a2c] text-xs font-semibold text-slate-200 border border-white/10 transition flex items-center gap-1.5 shadow-sm">
+          <span>🌐</span>
+          <span>አማርኛ</span>
         </button>
 
-        <button id="openReportBtn" class="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow-sm transition">
+        <button id="openReportBtn" class="px-3.5 py-1.5 rounded-lg btn-electric text-xs font-bold flex items-center gap-1.5 shadow-md">
           <span>⚡</span>
           <span data-i18n="btn_report">Report Outage</span>
         </button>
@@ -79,62 +127,87 @@
   <!-- Main Container -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-    <!-- Hero Search Bar -->
+    <!-- Hero Search & Command Bar -->
     <div class="relative max-w-2xl mx-auto">
-      <div class="relative">
+      <div class="relative flex items-center">
         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 text-[#06b6d4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
           </svg>
         </div>
         <input id="searchInput" type="text" 
-          class="w-full pl-10 pr-4 py-3 bg-slate-900/90 border border-slate-700 rounded-xl text-sm placeholder-slate-400 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 shadow-lg text-white"
+          class="w-full pl-10 pr-16 py-3 bg-[#161618] border border-white/[0.1] rounded-xl text-sm placeholder-slate-400 focus:outline-none focus:border-[#06b6d4] focus:ring-1 focus:ring-[#06b6d4] shadow-lg text-white font-sans transition"
           placeholder="Search sub-city, woreda, or neighborhood (e.g. Bole, ካዛንቺስ, Woreda 03)..." />
+        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+          <kbd class="px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-[#1f1f21] border border-white/10 rounded">
+            /
+          </kbd>
+        </div>
       </div>
       <!-- Autocomplete Dropdown -->
-      <div id="searchResults" class="absolute left-0 right-0 top-full mt-2 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-30 hidden overflow-hidden max-h-72 overflow-y-auto"></div>
+      <div id="searchResults" class="absolute left-0 right-0 top-full mt-2 glass-surface rounded-xl shadow-2xl z-30 hidden overflow-hidden max-h-72 overflow-y-auto"></div>
     </div>
 
-    <!-- Quick Metrics Counters -->
+    <!-- Telemetry Metric Cards Grid -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       
-      <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80 shadow flex items-center space-x-3.5">
-        <div class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 font-bold text-lg">
-          🔴
+      <!-- Metric 1: Critical Outages -->
+      <div class="amsale-card p-4 flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-semibold text-[#869397] uppercase tracking-wider" data-i18n="stat_current">Current Outages</span>
+          <span class="led-dot led-crimson"></span>
         </div>
-        <div>
-          <div id="statCurrent" class="text-xl sm:text-2xl font-black text-white leading-none">0</div>
-          <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider mt-1" data-i18n="stat_current">Current Outages</div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <div id="statCurrent" class="text-2xl sm:text-3xl font-bold text-white font-mono leading-none">0</div>
+          <span class="text-[11px] font-mono text-rose-400 font-medium">ACTIVE</span>
         </div>
-      </div>
-
-      <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80 shadow flex items-center space-x-3.5">
-        <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 font-bold text-lg">
-          🟡
-        </div>
-        <div>
-          <div id="statScheduled" class="text-xl sm:text-2xl font-black text-white leading-none">0</div>
-          <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider mt-1" data-i18n="stat_scheduled">Scheduled Today</div>
+        <div class="mt-2.5 w-full bg-white/[0.06] rounded-full h-1 overflow-hidden">
+          <div class="bg-rose-500 h-1 rounded-full" style="width: 15%"></div>
         </div>
       </div>
 
-      <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80 shadow flex items-center space-x-3.5">
-        <div class="w-10 h-10 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 font-bold text-lg">
-          👥
+      <!-- Metric 2: Scheduled Outages -->
+      <div class="amsale-card p-4 flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-semibold text-[#869397] uppercase tracking-wider" data-i18n="stat_scheduled">Scheduled Today</span>
+          <span class="led-dot led-amber"></span>
         </div>
-        <div>
-          <div id="statReports" class="text-xl sm:text-2xl font-black text-white leading-none">0</div>
-          <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider mt-1" data-i18n="stat_reports">Reports Today</div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <div id="statScheduled" class="text-2xl sm:text-3xl font-bold text-white font-mono leading-none">0</div>
+          <span class="text-[11px] font-mono text-amber-400 font-medium">PLANNED</span>
+        </div>
+        <div class="mt-2.5 w-full bg-white/[0.06] rounded-full h-1 overflow-hidden">
+          <div class="bg-amber-400 h-1 rounded-full" style="width: 35%"></div>
         </div>
       </div>
 
-      <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80 shadow flex items-center space-x-3.5">
-        <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-lg">
-          🗺️
+      <!-- Metric 3: Community Reports -->
+      <div class="amsale-card p-4 flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-semibold text-[#869397] uppercase tracking-wider" data-i18n="stat_reports">Reports Today</span>
+          <span class="led-dot led-cyan"></span>
         </div>
-        <div>
-          <div id="statMonitored" class="text-xl sm:text-2xl font-black text-white leading-none">116</div>
-          <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider mt-1" data-i18n="stat_monitored">Monitored Woredas</div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <div id="statReports" class="text-2xl sm:text-3xl font-bold text-white font-mono leading-none">0</div>
+          <span class="text-[11px] font-mono text-cyan-400 font-medium">CITIZENS</span>
+        </div>
+        <div class="mt-2.5 w-full bg-white/[0.06] rounded-full h-1 overflow-hidden">
+          <div class="bg-cyan-400 h-1 rounded-full" style="width: 20%"></div>
+        </div>
+      </div>
+
+      <!-- Metric 4: Monitored Woredas -->
+      <div class="amsale-card p-4 flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-semibold text-[#869397] uppercase tracking-wider" data-i18n="stat_monitored">Monitored Woredas</span>
+          <span class="led-dot led-emerald"></span>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <div id="statMonitored" class="text-2xl sm:text-3xl font-bold text-white font-mono leading-none">116</div>
+          <span class="text-[11px] font-mono text-emerald-400 font-medium">10 SUBCITIES</span>
+        </div>
+        <div class="mt-2.5 w-full bg-white/[0.06] rounded-full h-1 overflow-hidden">
+          <div class="bg-emerald-400 h-1 rounded-full" style="width: 100%"></div>
         </div>
       </div>
 
@@ -143,37 +216,38 @@
     <!-- VIEW 1: LIVE MAP -->
     <section id="view-map" class="view-section space-y-4">
       
-      <!-- Map Container Card -->
-      <div class="p-2 sm:p-3 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl">
+      <!-- Map Bezel Card -->
+      <div class="amsale-card p-2 sm:p-3 relative overflow-hidden shadow-2xl">
         <div id="map"></div>
 
-        <!-- Map Legend -->
-        <div class="mt-3 px-3 py-2 bg-slate-950/80 rounded-xl border border-slate-800/60 flex flex-wrap items-center justify-between gap-3 text-xs">
-          <div class="flex flex-wrap items-center gap-4">
-            <span class="flex items-center gap-1.5 text-slate-300">
-              <span class="w-3 h-3 rounded-sm bg-emerald-500 inline-block"></span>
+        <!-- Glassmorphic Map Telemetry Legend -->
+        <div class="mt-3 px-4 py-2.5 glass-surface rounded-xl flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="flex flex-wrap items-center gap-4 sm:gap-5">
+            <span class="flex items-center gap-2 text-slate-300 font-medium">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
               <span data-i18n="legend_normal">Normal</span>
             </span>
-            <span class="flex items-center gap-1.5 text-slate-300">
-              <span class="w-3 h-3 rounded-sm bg-amber-500 inline-block"></span>
+            <span class="flex items-center gap-2 text-slate-300 font-medium">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]"></span>
               <span data-i18n="legend_scheduled">Scheduled Outage</span>
             </span>
-            <span class="flex items-center gap-1.5 text-slate-300">
-              <span class="w-3 h-3 rounded-sm bg-red-500 inline-block"></span>
+            <span class="flex items-center gap-2 text-slate-300 font-medium">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.7)]"></span>
               <span data-i18n="legend_current">Current Outage</span>
             </span>
-            <span class="flex items-center gap-1.5 text-slate-300">
-              <span class="w-3 h-3 rounded-sm bg-orange-500 inline-block"></span>
+            <span class="flex items-center gap-2 text-slate-300 font-medium">
+              <span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
               <span data-i18n="legend_likely">Likely Outage</span>
             </span>
-            <span class="flex items-center gap-1.5 text-slate-400">
-              <span class="w-3 h-3 rounded-sm bg-slate-500 inline-block"></span>
+            <span class="flex items-center gap-2 text-[#869397]">
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
               <span data-i18n="legend_unknown">Unknown</span>
             </span>
           </div>
 
-          <div class="text-[11px] text-slate-400">
-            Click any woreda polygon to view real-time status & announcements.
+          <div class="text-[11px] font-mono text-[#869397] flex items-center gap-1.5">
+            <span>💡</span>
+            <span>Click any woreda polygon or pulsing pinpoint to inspect real-time telemetry.</span>
           </div>
         </div>
       </div>
@@ -184,40 +258,43 @@
     <section id="view-outages" class="view-section hidden space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-3 mb-2">
         <div>
-          <h2 class="text-lg font-bold text-white" data-i18n="nav_outages">Outages Feed</h2>
-          <span class="text-xs text-slate-400">Addis Ababa PostGIS & National Regional Hubs</span>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <span class="text-[#06b6d4]">⚡</span>
+            <span data-i18n="nav_outages">Outages Feed</span>
+          </h2>
+          <span class="text-xs font-mono text-[#869397]">Addis Ababa PostGIS & National Regional Hubs</span>
         </div>
         
         <!-- Primary Scope Tabs & Region Filter -->
         <div class="flex flex-wrap items-center gap-2">
-          <div class="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs">
-            <button id="tabUpcomingOutages" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold outages-tab-btn flex items-center gap-1.5" data-tab="upcoming">
+          <div class="flex items-center gap-1 bg-[#161618] p-1 rounded-xl border border-white/[0.08] text-xs">
+            <button id="tabUpcomingOutages" class="px-3 py-1.5 rounded-lg bg-[#06b6d4] text-[#00252e] font-bold outages-tab-btn flex items-center gap-1.5 transition shadow-sm" data-tab="upcoming">
               <span>⚡</span>
               <span data-i18n="tab_upcoming_active">Active & Upcoming</span>
-              <span id="badgeUpcomingCount" class="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-950/40 text-slate-900 font-extrabold">0</span>
+              <span id="badgeUpcomingCount" class="px-1.5 py-0.2 rounded-full text-[10px] bg-black/20 text-[#00252e] font-mono font-extrabold">0</span>
             </button>
-            <button id="tabHistoryOutages" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white outages-tab-btn flex items-center gap-1.5" data-tab="history">
+            <button id="tabHistoryOutages" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white outages-tab-btn flex items-center gap-1.5 transition" data-tab="history">
               <span>📜</span>
               <span data-i18n="tab_history">History (Capped to 30)</span>
-              <span id="badgeHistoryCount" class="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-800 text-slate-300 font-extrabold">0</span>
+              <span id="badgeHistoryCount" class="px-1.5 py-0.2 rounded-full text-[10px] bg-[#2a2a2c] text-slate-300 font-mono font-bold">0</span>
             </button>
           </div>
 
-          <div class="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs">
-            <button id="filterRegionAll" class="px-2.5 py-1.5 rounded-lg bg-slate-800 text-amber-400 font-semibold region-filter-btn" data-filter="all">All</button>
-            <button id="filterRegionAddis" class="px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-white region-filter-btn" data-filter="Addis Ababa">Addis</button>
-            <button id="filterRegionRegional" class="px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-white region-filter-btn" data-filter="regional">Regional</button>
+          <div class="flex items-center gap-1 bg-[#161618] p-1 rounded-xl border border-white/[0.08] text-xs">
+            <button id="filterRegionAll" class="px-2.5 py-1.5 rounded-lg bg-[#2a2a2c] text-[#4cd7f6] font-semibold region-filter-btn transition" data-filter="all">All</button>
+            <button id="filterRegionAddis" class="px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-white region-filter-btn transition" data-filter="Addis Ababa">Addis</button>
+            <button id="filterRegionRegional" class="px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-white region-filter-btn transition" data-filter="regional">Regional</button>
           </div>
         </div>
       </div>
 
       <!-- Historical Notice Banner (visible only in history tab) -->
-      <div id="historyBanner" class="hidden p-3.5 bg-slate-900/90 border border-slate-700/80 rounded-xl flex items-center justify-between text-xs text-slate-300">
+      <div id="historyBanner" class="hidden p-3.5 amsale-card flex items-center justify-between text-xs text-slate-300">
         <div class="flex items-center gap-2">
           <span class="text-amber-400 text-base">ℹ️</span>
           <span data-i18n="history_capped_notice">Showing the 30 most recent concluded outages. Older records are archived.</span>
         </div>
-        <span class="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[11px] font-mono border border-slate-700">MAX 30 ENTRIES</span>
+        <span class="px-2.5 py-0.5 rounded-full bg-[#1f1f21] text-slate-400 text-[11px] font-mono border border-white/10">MAX 30 ENTRIES</span>
       </div>
 
       <div id="outagesListContainer" class="space-y-3"></div>
@@ -227,10 +304,13 @@
     <section id="view-calendar" class="view-section hidden space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-3 mb-2">
         <div>
-          <h2 class="text-lg font-bold text-white" data-i18n="nav_calendar">Outage Calendar</h2>
-          <span class="text-xs text-slate-400">Official EEU Schedule</span>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <span class="text-amber-400">📅</span>
+            <span data-i18n="nav_calendar">Outage Calendar</span>
+          </h2>
+          <span class="text-xs font-mono text-[#869397]">Official EEU Maintenance Schedules</span>
         </div>
-        <button id="toggleCalendarHistoryBtn" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-slate-300 hover:text-amber-400 hover:border-amber-400/50 flex items-center gap-1.5 transition">
+        <button id="toggleCalendarHistoryBtn" class="px-3.5 py-1.5 rounded-xl bg-[#161618] border border-white/10 text-xs text-slate-300 hover:text-[#4cd7f6] hover:border-cyan-500/40 flex items-center gap-1.5 transition">
           <span>📜</span>
           <span id="calendarHistoryBtnLabel" data-i18n="calendar_show_history">Show Past Outage History (Capped to 30)</span>
         </button>
@@ -238,13 +318,13 @@
       <div id="calendarContainer" class="space-y-4"></div>
       
       <!-- Collapsible Calendar Past History Section -->
-      <div id="calendarHistorySection" class="hidden space-y-3 pt-4 border-t border-slate-800">
+      <div id="calendarHistorySection" class="hidden space-y-3 pt-4 border-t border-white/[0.08]">
         <div class="flex items-center justify-between">
-          <h3 class="text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+          <h3 class="text-sm font-bold text-[#ffb873] uppercase tracking-wider flex items-center gap-1.5">
             <span>📜</span>
             <span data-i18n="tab_history">Past Outage History (Capped to 30)</span>
           </h3>
-          <span class="text-[11px] text-slate-400">Concluded EEU maintenance windows</span>
+          <span class="text-[11px] font-mono text-[#869397]">Concluded EEU maintenance windows</span>
         </div>
         <div id="calendarHistoryContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
       </div>
@@ -253,34 +333,42 @@
     <!-- VIEW 4: AREAS DIRECTORY -->
     <section id="view-areas" class="view-section hidden space-y-4">
       <div class="flex items-center justify-between mb-2">
-        <h2 class="text-lg font-bold text-white" data-i18n="nav_areas">Addis Ababa Administrative Directory</h2>
-        <span class="text-xs text-slate-400">10 Sub-cities • 116 Woredas</span>
+        <div>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <span class="text-emerald-400">🗺️</span>
+            <span data-i18n="nav_areas">Addis Ababa Administrative Directory</span>
+          </h2>
+          <span class="text-xs font-mono text-[#869397]">10 Sub-cities • 116 Woredas Live Status</span>
+        </div>
       </div>
       <div id="areasContainer"></div>
     </section>
 
     <!-- VIEW 5: ADMIN & AI AUDIT QUEUE -->
     <section id="view-admin" class="view-section hidden space-y-4">
-      <div class="p-5 bg-slate-900 border border-slate-800 rounded-2xl">
-        <h2 class="text-lg font-bold text-white" data-i18n="admin_title">EEU Announcement & Extraction Audit</h2>
-        <p class="text-xs text-slate-400 mt-1" data-i18n="admin_desc">Review and verify incoming announcements before canonical outage generation.</p>
+      <div class="amsale-card p-5">
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <span>⚙️</span>
+          <span data-i18n="admin_title">EEU Announcement & Extraction Audit</span>
+        </h2>
+        <p class="text-xs text-[#869397] mt-1" data-i18n="admin_desc">Review and verify incoming announcements before canonical outage generation.</p>
       </div>
       <div id="adminQueueContainer" class="space-y-4"></div>
     </section>
 
   </main>
 
-  <!-- Woreda Detail Modal -->
-  <div id="detailModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+  <!-- Woreda Detail Modal (Frosted Glass Level 2) -->
+  <div id="detailModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
+    <div class="glass-modal rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 border border-white/[0.12]">
       
       <div class="flex items-start justify-between">
         <div>
           <h3 id="modalTitle" class="text-lg font-bold text-white">Bole Woreda 03</h3>
-          <p id="modalSubcity" class="text-xs text-slate-400">Bole Sub-city</p>
+          <p id="modalSubcity" class="text-xs font-mono text-[#869397]">Bole Sub-city</p>
         </div>
         <div class="flex items-center gap-2">
-          <span id="modalStatusBadge" class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-900/60 text-emerald-300 border border-emerald-700">
+          <span id="modalStatusBadge" class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/70 text-emerald-300 border border-emerald-700/60 shadow-sm">
             Normal
           </span>
           <button type="button" onclick="document.getElementById('detailModal').classList.add('hidden')" class="text-slate-400 hover:text-white p-1 text-base leading-none transition">
@@ -289,22 +377,22 @@
         </div>
       </div>
 
-      <div class="space-y-3 pt-2 text-sm text-slate-300 border-t border-slate-800">
+      <div class="space-y-3 pt-2 text-sm text-slate-300 border-t border-white/[0.08]">
         <div id="modalDateBox" class="hidden">
-          <div class="text-xs font-semibold text-slate-400" data-i18n="date_label">Scheduled Date</div>
-          <div id="modalDateEth" class="font-bold text-amber-400 text-sm mt-0.5"></div>
-          <div id="modalDateGreg" class="text-xs text-slate-400"></div>
+          <div class="text-xs font-semibold text-[#869397] uppercase tracking-wider" data-i18n="date_label">Scheduled Date</div>
+          <div id="modalDateEth" class="font-bold text-[#ffb873] font-mono text-sm mt-0.5"></div>
+          <div id="modalDateGreg" class="text-xs text-[#869397] font-mono"></div>
         </div>
 
         <div id="modalTimeBox" class="hidden">
-          <div class="text-xs font-semibold text-slate-400" data-i18n="time_label">Time Window</div>
-          <div id="modalTimeEth" class="font-semibold text-white text-sm mt-0.5"></div>
-          <div id="modalTimeCivil" class="text-xs text-slate-400"></div>
+          <div class="text-xs font-semibold text-[#869397] uppercase tracking-wider" data-i18n="time_label">Time Window</div>
+          <div id="modalTimeEth" class="font-semibold text-white font-mono text-sm mt-0.5"></div>
+          <div id="modalTimeCivil" class="text-xs text-[#869397] font-mono"></div>
         </div>
 
         <!-- Specific Affected Landmarks & Condos in Woreda -->
-        <div id="modalLandmarksBox" class="hidden rounded-xl bg-slate-950/60 border border-amber-500/30 p-3 space-y-2">
-          <div class="text-xs font-semibold text-amber-400 flex items-center justify-between">
+        <div id="modalLandmarksBox" class="hidden rounded-xl bg-[#0e0e10] border border-cyan-500/30 p-3 space-y-2">
+          <div class="text-xs font-semibold text-[#4cd7f6] flex items-center justify-between">
             <span class="flex items-center gap-1.5">
               <span>📍</span>
               <span data-i18n="specific_landmarks_title">Specific Affected Landmarks & Neighborhoods</span>
@@ -315,73 +403,73 @@
         </div>
 
         <div id="modalReasonBox" class="hidden">
-          <div class="text-xs font-semibold text-slate-400" data-i18n="reason_label">Reason</div>
+          <div class="text-xs font-semibold text-[#869397] uppercase tracking-wider" data-i18n="reason_label">Reason</div>
           <div id="modalReason" class="text-sm text-slate-200 mt-0.5"></div>
         </div>
 
         <div>
-          <div class="text-xs font-semibold text-slate-400" data-i18n="source_label">Source Attribution</div>
-          <div id="modalSource" class="text-sm text-slate-200 mt-0.5">EEU Official Announcement</div>
+          <div class="text-xs font-semibold text-[#869397] uppercase tracking-wider" data-i18n="source_label">Source Attribution</div>
+          <div id="modalSource" class="text-sm text-slate-200 mt-0.5 font-medium">EEU Official Announcement</div>
         </div>
 
         <!-- Quoted Official Announcement Point & Embed -->
-        <div id="modalQuoteBox" class="hidden rounded-xl bg-slate-950/80 border border-slate-700/80 p-3.5 space-y-2.5">
+        <div id="modalQuoteBox" class="hidden rounded-xl bg-[#0e0e10] border border-white/[0.1] p-3.5 space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
               <span>🎯</span>
               <span data-i18n="quoted_specific_point">Quoted Point in Announcement</span>
             </span>
-            <button id="modalCopySearchBtn" type="button" class="hidden text-[11px] px-2 py-0.5 rounded bg-sky-950 hover:bg-sky-900 text-sky-300 border border-sky-700/70 transition font-medium">
+            <button id="modalCopySearchBtn" type="button" class="hidden text-[11px] px-2.5 py-1 rounded-lg bg-sky-950 hover:bg-sky-900 text-sky-300 border border-sky-700/70 transition font-medium">
               <span id="modalCopySearchLabel">📋 Copy Keyword</span>
             </button>
           </div>
           
-          <div id="modalQuotePointContainer" class="text-xs text-slate-200 border-l-2 border-amber-400 pl-3 py-1 font-mono whitespace-pre-line leading-relaxed bg-slate-900/60 rounded-r-lg">
-            <div id="modalQuoteTimeHeader" class="text-amber-400 font-bold mb-1"></div>
+          <div id="modalQuotePointContainer" class="text-xs text-slate-200 border-l-2 border-[#06b6d4] pl-3 py-1 font-mono whitespace-pre-line leading-relaxed bg-[#161618] rounded-r-lg">
+            <div id="modalQuoteTimeHeader" class="text-[#4cd7f6] font-bold mb-1"></div>
             <div id="modalQuoteSnippet" class="text-slate-100"></div>
           </div>
 
           <!-- Collapsible full announcement if user wants context -->
-          <details id="modalFullTextDetails" class="hidden group text-[11px] text-slate-400">
+          <details id="modalFullTextDetails" class="hidden group text-[11px] text-[#869397]">
             <summary class="cursor-pointer select-none text-slate-400 hover:text-slate-300 font-medium">
               <span data-i18n="view_full_announcement">View Full Post Text</span> ▾
             </summary>
-            <blockquote id="modalQuoteText" class="mt-1.5 text-[11px] text-slate-300 border-l border-slate-700 pl-2.5 py-1 font-mono whitespace-pre-line max-h-32 overflow-y-auto leading-relaxed bg-slate-900/40 rounded-r">
+            <blockquote id="modalQuoteText" class="mt-1.5 text-[11px] text-slate-300 border-l border-white/10 pl-2.5 py-1 font-mono whitespace-pre-line max-h-32 overflow-y-auto leading-relaxed bg-[#161618] rounded-r">
             </blockquote>
           </details>
 
-          <div class="flex items-center justify-between pt-1 border-t border-slate-800 text-xs">
-            <a id="modalSourceLink" href="#" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:text-sky-300 font-semibold underline flex items-center gap-1">
+          <div class="flex items-center justify-between pt-1 border-t border-white/[0.08] text-xs">
+            <a id="modalSourceLink" href="#" target="_blank" rel="noopener noreferrer" class="text-[#4cd7f6] hover:underline font-semibold flex items-center gap-1">
               <span>Open in Telegram ↗</span>
             </a>
-            <button id="modalToggleEmbedBtn" type="button" class="text-[11px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 transition">
+            <button id="modalToggleEmbedBtn" type="button" class="text-[11px] px-2.5 py-1 rounded-lg bg-[#1f1f21] hover:bg-[#2a2a2c] text-amber-400 border border-white/10 transition">
               <span id="modalToggleEmbedLabel">Show Embed ▾</span>
             </button>
           </div>
 
           <div id="modalEmbedWrapper" class="hidden pt-1">
-            <iframe id="modalTelegramIframe" src="" class="w-full h-64 rounded-xl border border-slate-700/80 bg-slate-900" frameborder="0" loading="lazy"></iframe>
+            <iframe id="modalTelegramIframe" src="" class="w-full h-64 rounded-xl border border-white/[0.1] bg-[#161618]" frameborder="0" loading="lazy"></iframe>
           </div>
         </div>
 
         <div id="modalSourceLinkBox" class="hidden">
-          <div class="text-xs font-semibold text-slate-400">Original Announcement</div>
-          <a id="modalSourceLinkFallback" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs text-sky-400 hover:text-sky-300 font-medium mt-1 underline">
+          <div class="text-xs font-semibold text-[#869397]">Original Announcement</div>
+          <a id="modalSourceLinkFallback" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs text-[#4cd7f6] hover:underline font-medium mt-1">
             <span>View Original Post on Telegram ↗</span>
           </a>
         </div>
 
         <div>
-          <div class="text-xs font-semibold text-slate-400" data-i18n="confidence_label">Confidence</div>
+          <div class="text-xs font-semibold text-[#869397] uppercase tracking-wider" data-i18n="confidence_label">Confidence</div>
           <div id="modalConfidence" class="text-sm text-emerald-400 font-semibold mt-0.5">Official</div>
         </div>
       </div>
 
-      <div class="pt-4 border-t border-slate-800 flex items-center justify-between gap-3">
-        <button id="modalReportBtn" class="flex-1 py-2 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition">
+      <div class="pt-4 border-t border-white/[0.08] flex items-center justify-between gap-3">
+        <button id="modalReportBtn" class="flex-1 py-2.5 px-4 rounded-xl btn-electric text-xs font-bold transition">
           Report Status Here
         </button>
-        <button onclick="document.getElementById('detailModal').classList.add('hidden')" class="py-2 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700 transition">
+        <button onclick="document.getElementById('detailModal').classList.add('hidden')" class="py-2.5 px-4 rounded-xl btn-ghost-dark text-xs font-medium transition">
           Close
         </button>
       </div>
@@ -389,32 +477,32 @@
     </div>
   </div>
 
-  <!-- Community Report Modal -->
-  <div id="reportModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+  <!-- Community Report Modal (Frosted Glass Level 2) -->
+  <div id="reportModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
+    <div class="glass-modal rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 border border-white/[0.12]">
       
       <div class="flex items-start justify-between">
         <div>
           <h3 class="text-lg font-bold text-white flex items-center gap-2">
-            <span>⚡</span>
+            <span class="text-[#06b6d4]">⚡</span>
             <span data-i18n="report_modal_title">Report Electricity Outage</span>
           </h3>
-          <p class="text-xs text-slate-400 mt-1" data-i18n="report_modal_desc">
+          <p class="text-xs text-[#869397] mt-1" data-i18n="report_modal_desc">
             Your report helps neighbors know if power is out. Coordinates are private and aggregated into Woreda data.
           </p>
         </div>
-        <button id="closeReportBtn" class="text-slate-400 hover:text-white">✕</button>
+        <button id="closeReportBtn" class="text-slate-400 hover:text-white p-1 leading-none">✕</button>
       </div>
 
       <form id="outageReportForm" class="space-y-4 pt-2">
         
         <!-- Status Selector -->
         <div class="grid grid-cols-2 gap-3">
-          <label class="p-3 rounded-xl border border-red-500/40 bg-red-950/30 hover:bg-red-950/50 cursor-pointer flex items-center space-x-2 text-xs font-semibold text-red-200">
-            <input type="radio" name="report_type" value="POWER_OUT" checked class="text-red-500 focus:ring-red-500">
+          <label class="p-3.5 rounded-xl border border-rose-500/40 bg-rose-950/30 hover:bg-rose-950/50 cursor-pointer flex items-center space-x-2.5 text-xs font-semibold text-rose-200 transition">
+            <input type="radio" name="report_type" value="POWER_OUT" checked class="text-rose-500 focus:ring-rose-500">
             <span data-i18n="report_type_out">Power is OUT</span>
           </label>
-          <label class="p-3 rounded-xl border border-emerald-500/40 bg-emerald-950/30 hover:bg-emerald-950/50 cursor-pointer flex items-center space-x-2 text-xs font-semibold text-emerald-200">
+          <label class="p-3.5 rounded-xl border border-emerald-500/40 bg-emerald-950/30 hover:bg-emerald-950/50 cursor-pointer flex items-center space-x-2.5 text-xs font-semibold text-emerald-200 transition">
             <input type="radio" name="report_type" value="POWER_RESTORED" class="text-emerald-500 focus:ring-emerald-500">
             <span data-i18n="report_type_restored">Power has RETURNED</span>
           </label>
@@ -424,10 +512,10 @@
         <div class="space-y-1.5">
           <label class="text-xs font-semibold text-slate-300">Select Woreda</label>
           <div class="flex gap-2">
-            <select id="reportWoredaSelect" class="flex-1 py-2.5 px-3 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
+            <select id="reportWoredaSelect" class="flex-1 py-2.5 px-3 bg-[#161618] border border-white/[0.1] rounded-xl text-xs text-white focus:outline-none focus:border-[#06b6d4]">
               <option value="">-- Loading Woredas... --</option>
             </select>
-            <button type="button" id="gpsLocateBtn" class="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-medium text-amber-400 whitespace-nowrap" data-i18n="btn_locate_me">
+            <button type="button" id="gpsLocateBtn" class="px-3.5 py-2.5 bg-[#1f1f21] hover:bg-[#2a2a2c] border border-white/10 rounded-xl text-xs font-medium text-[#4cd7f6] whitespace-nowrap transition" data-i18n="btn_locate_me">
               Detect My Location
             </button>
           </div>
@@ -437,15 +525,15 @@
         <div class="space-y-1.5">
           <label class="text-xs font-semibold text-slate-300">Notes / Landmarks (Optional)</label>
           <textarea id="reportComments" rows="2" 
-            class="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+            class="w-full p-2.5 bg-[#161618] border border-white/[0.1] rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#06b6d4]"
             placeholder="e.g. Near Bole Medhanialem, streetlights also off..."></textarea>
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-2">
-          <button type="button" id="cancelReportBtn" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300" data-i18n="btn_cancel">
+          <button type="button" id="cancelReportBtn" class="px-4 py-2.5 rounded-xl btn-ghost-dark text-xs font-medium" data-i18n="btn_cancel">
             Cancel
           </button>
-          <button type="submit" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md transition" data-i18n="btn_submit_report">
+          <button type="submit" class="px-5 py-2.5 rounded-xl btn-electric text-xs font-bold shadow-md transition" data-i18n="btn_submit_report">
             Submit Report
           </button>
         </div>
@@ -456,10 +544,15 @@
   </div>
 
   <!-- Footer -->
-  <footer class="mt-auto border-t border-slate-800 bg-slate-900/50 py-6 text-center text-xs text-slate-500">
+  <footer class="mt-auto border-t border-white/[0.06] bg-[#0a0a0b]/80 py-6 text-center text-xs text-[#869397]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-2">
-      <div>⚡ <strong>Ethiopian Power Monitor</strong> — Independent Civic-Tech Electricity Intelligence</div>
-      <div>Source Data: Ethiopian Electric Utility (EEU) official announcements & community reports. WGS 84 / PostGIS.</div>
+      <div class="flex items-center justify-center gap-2 text-slate-300">
+        <span class="text-[#06b6d4]">⚡</span>
+        <strong>Ethiopian Power Monitor</strong>
+        <span class="text-white/20">•</span>
+        <span class="font-mono text-[11px] text-[#869397]">Amsale Monitoring Architecture</span>
+      </div>
+      <div>Source Data: Ethiopian Electric Utility (EEU) announcements & community verified reports. WGS 84 / PostGIS.</div>
     </div>
   </footer>
 
