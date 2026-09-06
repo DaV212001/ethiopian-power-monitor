@@ -126,3 +126,32 @@ body {
     opacity: 0;
   }
 }
+
+/* Dark styled Leaflet layer switcher control */
+.leaflet-control-layers {
+  background: rgba(15, 23, 42, 0.92) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(51, 65, 85, 0.8) !important;
+  border-radius: 12px !important;
+  color: #f1f5f9 !important;
+  font-family: inherit;
+  font-size: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+}
+
+.leaflet-control-layers-expanded {
+  padding: 8px 12px !important;
+}
+
+.leaflet-control-layers-toggle {
+  filter: invert(1) brightness(0.9);
+}
+
+.leaflet-control-layers label {
+  margin-bottom: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+

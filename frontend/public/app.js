@@ -319,12 +319,56 @@ function initMap() {
     maxZoom: 17,
   }).setView([9.0105, 38.7612], 11); // Center Addis Ababa
 
-  // Clean, high-contrast dark basemap from Carto
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-    subdomains: 'abcd',
+  // 1. Sleek, high-contrast Dark Canvas (Esri World Dark Gray Base + Reference) - 0 watermark, 0 API key required
+  const darkBase = L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+    {
+      attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+      maxZoom: 16,
+    }
+  );
+
+  const darkRef = L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+    {
+      attribution: '',
+      maxZoom: 16,
+    }
+  );
+
+  const darkLayerGroup = L.layerGroup([darkBase, darkRef]).addTo(mapInstance);
+
+  // 2. OpenStreetMap Standard (Full street-level & neighborhood detail) - 0 watermark, 0 API key
+  const osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
     maxZoom: 19,
-  }).addTo(mapInstance);
+  });
+
+  // 3. Esri Satellite Imagery (High-resolution aerial photography) - 0 watermark, 0 API key
+  const satelliteLayer = L.layerGroup([
+    L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS',
+        maxZoom: 18,
+      }
+    ),
+    L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+      {
+        attribution: '',
+        maxZoom: 18,
+      }
+    ),
+  ]);
+
+  const baseMaps = {
+    '🌙 Dark Canvas': darkLayerGroup,
+    '🗺️ Street View': osmLayer,
+    '🛰️ Satellite': satelliteLayer,
+  };
+
+  L.control.layers(baseMaps, null, { position: 'topright' }).addTo(mapInstance);
 
   landmarkPinsLayer = L.layerGroup().addTo(mapInstance);
 }
