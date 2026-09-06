@@ -62,6 +62,9 @@ const I18N = {
     calendar_hide_history: 'Hide Past Outage History',
     status_concluded: 'Concluded',
     no_history_outages: 'No concluded historical outages recorded.',
+    quoted_telegram_title: 'Quoted Official Telegram Announcement',
+    show_embed: 'Show Embed ▾',
+    hide_embed: 'Hide Embed ▴',
   },
   am: {
     brand_title: 'የኢትዮጵያ የኃይል መከታተያ',
@@ -119,6 +122,9 @@ const I18N = {
     calendar_hide_history: 'ያለፉ መቋረጦችን ደብቅ',
     status_concluded: 'የተጠናቀቀ',
     no_history_outages: 'የተመዘገበ ያለፈ መቋረጥ የለም።',
+    quoted_telegram_title: 'የቴሌግራም ይፋዊ ማስታወቂያ ጽሑፍ',
+    show_embed: 'ማስታወቂያውን አሳይ ▾',
+    hide_embed: 'ማስታወቂያውን ደብቅ ▴',
   },
 };
 
@@ -631,6 +637,49 @@ function openWoredaDetailModal(properties, statusInfo) {
   document.getElementById('modalConfidence').textContent =
     statusInfo && statusInfo.confidence ? statusInfo.confidence : 'OFFICIAL';
 
+  // Quoted Official Announcement & Embed
+  const quoteBox = document.getElementById('modalQuoteBox');
+  const quoteText = document.getElementById('modalQuoteText');
+  const toggleEmbedBtn = document.getElementById('modalToggleEmbedBtn');
+  const toggleEmbedLabel = document.getElementById('modalToggleEmbedLabel');
+  const embedWrapper = document.getElementById('modalEmbedWrapper');
+  const telegramIframe = document.getElementById('modalTelegramIframe');
+
+  if (quoteBox && quoteText) {
+    if (statusInfo && statusInfo.raw_text) {
+      quoteText.textContent = statusInfo.raw_text.trim();
+      quoteBox.classList.remove('hidden');
+
+      if (embedWrapper) embedWrapper.classList.add('hidden');
+      if (toggleEmbedLabel) toggleEmbedLabel.textContent = t('show_embed');
+      if (telegramIframe) telegramIframe.src = '';
+
+      if (toggleEmbedBtn && statusInfo.source_url) {
+        toggleEmbedBtn.classList.remove('hidden');
+        toggleEmbedBtn.onclick = (e) => {
+          e.preventDefault();
+          const isHidden = embedWrapper.classList.contains('hidden');
+          if (isHidden) {
+            const embedUrl = statusInfo.source_url.includes('?')
+              ? `${statusInfo.source_url}&embed=1`
+              : `${statusInfo.source_url}?embed=1`;
+            telegramIframe.src = embedUrl;
+            embedWrapper.classList.remove('hidden');
+            if (toggleEmbedLabel) toggleEmbedLabel.textContent = t('hide_embed');
+          } else {
+            embedWrapper.classList.add('hidden');
+            if (toggleEmbedLabel) toggleEmbedLabel.textContent = t('show_embed');
+          }
+        };
+      } else if (toggleEmbedBtn) {
+        toggleEmbedBtn.classList.add('hidden');
+      }
+    } else {
+      quoteBox.classList.add('hidden');
+      if (telegramIframe) telegramIframe.src = '';
+    }
+  }
+
   // Telegram Source Link
   const sourceLinkBox = document.getElementById('modalSourceLinkBox');
   const sourceLink = document.getElementById('modalSourceLink');
@@ -727,6 +776,78 @@ function initSearch() {
       resultsBox.classList.add('hidden');
     }
   });
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+window.toggleEmbedIframe = function (wrapperId, sourceUrl, btnId) {
+  const wrapper = document.getElementById(wrapperId);
+  const btn = document.getElementById(btnId);
+  if (!wrapper) return;
+  const iframe = wrapper.querySelector('iframe');
+  const isHidden = wrapper.classList.contains('hidden');
+  if (isHidden) {
+    if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === window.location.href)) {
+      const embedUrl =
+        iframe.getAttribute('data-src') ||
+        (sourceUrl.includes('?') ? `${sourceUrl}&embed=1` : `${sourceUrl}?embed=1`);
+      iframe.src = embedUrl;
+    }
+    wrapper.classList.remove('hidden');
+    if (btn) btn.textContent = t('hide_embed');
+  } else {
+    wrapper.classList.add('hidden');
+    if (btn) btn.textContent = t('show_embed');
+  }
+};
+
+function renderQuotedAnnouncementSection(rawText, sourceUrl, uniqueId) {
+  if (!rawText) return '';
+  const escapedText = escapeHtml(rawText.trim());
+  const embedId = `embed-box-${uniqueId}`;
+  const btnId = `embed-btn-${uniqueId}`;
+
+  const embedControls = sourceUrl
+    ? `
+      <div class="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-xs">
+        <button id="${btnId}" type="button" onclick="toggleEmbedIframe('${embedId}', '${sourceUrl}', '${btnId}')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-medium transition">
+          ${t('show_embed')}
+        </button>
+        <a href="${sourceUrl}" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:text-sky-300 underline font-medium">
+          Telegram ↗
+        </a>
+      </div>
+      <div id="${embedId}" class="hidden pt-2">
+        <iframe src="" data-src="${
+          sourceUrl.includes('?') ? sourceUrl + '&embed=1' : sourceUrl + '?embed=1'
+        }" class="w-full h-64 rounded-xl border border-slate-700/80 bg-slate-900" frameborder="0" loading="lazy"></iframe>
+      </div>
+    `
+    : '';
+
+  return `
+    <details class="mt-3 group bg-slate-900/80 border border-slate-700/80 rounded-xl p-3">
+      <summary class="cursor-pointer text-xs font-semibold text-sky-400 flex items-center justify-between select-none hover:text-sky-300 transition">
+        <span class="flex items-center gap-1.5">
+          <span>💬</span>
+          <span>${t('quoted_telegram_title')}</span>
+        </span>
+        <span class="text-slate-400 text-[10px] transform group-open:rotate-180 transition-transform duration-200">▼</span>
+      </summary>
+      <blockquote class="mt-2 text-xs text-slate-200 border-l-2 border-amber-400 pl-3 py-1 font-mono whitespace-pre-line max-h-48 overflow-y-auto leading-relaxed bg-slate-950/60 rounded-r-lg">
+${escapedText}
+      </blockquote>
+      ${embedControls}
+    </details>
+  `;
 }
 
 // Render Outages List View
@@ -844,6 +965,7 @@ function renderOutagesList() {
           ${areas.length > 0 ? `<span>📍 ${areas.length} Woreda(s) affected</span>` : `<span>📍 Regional Town / Grid Substation</span>`}
           ${isHistory && o.scheduled_end ? `<span>🏁 Concluded at ${civilTimeDisplay.split('–')[1] || civilTimeDisplay}</span>` : ''}
         </div>
+        ${renderQuotedAnnouncementSection(o.raw_text, o.source_url, `list-${o.id}`)}
       </div>
     `;
     })
@@ -910,6 +1032,7 @@ function renderCalendar() {
                   currentLang === 'am' ? s.reason_am || s.reason : s.reason || 'Maintenance'
                 }</div>
               </div>
+              ${renderQuotedAnnouncementSection(s.raw_text, s.source_url, `cal-${s.id}`)}
               <div class="mt-4 pt-3 border-t border-slate-700/60 flex items-center justify-between text-xs text-slate-400">
                 ${s.source_url ? `<a href="${s.source_url}" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:text-sky-300 font-semibold underline flex items-center gap-1"><span>Telegram Post</span><span>↗</span></a>` : `<span>Source: EEU Official</span>`}
                 <span class="text-emerald-400">Scheduled Ahead</span>
@@ -976,6 +1099,7 @@ function renderCalendarHistory() {
             <div class="text-xs text-white font-medium mb-1">${displayArea}</div>
             <div class="text-[11px] text-slate-400">${currentLang === 'am' ? s.reason_am || s.reason : s.reason || 'Maintenance'}</div>
           </div>
+          ${renderQuotedAnnouncementSection(s.raw_text, s.source_url, `hist-${s.id}`)}
           <div class="mt-3 pt-2 border-t border-slate-700/40 flex items-center justify-between text-[11px] text-slate-400">
             ${s.source_url ? `<a href="${s.source_url}" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:text-sky-300 underline flex items-center gap-1"><span>Telegram</span><span>↗</span></a>` : `<span>EEU Official</span>`}
             <span class="text-slate-500 font-mono text-[10px]">CAPPED HISTORY</span>

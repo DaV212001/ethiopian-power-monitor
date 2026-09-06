@@ -185,6 +185,7 @@ export class TelegramIngestionService {
           review_status: 'AUTOMATIC',
           source_url: sourceUrl,
           ethiopian_date: extracted.ethiopian_date || extracted.outage_date_raw || null,
+          raw_text: msg.raw_text,
           region_name: block.region_name || (block.is_addis_ababa ? 'Addis Ababa' : 'Regional'),
           affected_locations_raw: block.location_tokens.length > 0 ? block.location_tokens : (block.raw_locations_text ? [block.raw_locations_text] : []),
         };
