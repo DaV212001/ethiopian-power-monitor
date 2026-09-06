@@ -48,6 +48,7 @@ export class TelegramIngestionService {
     apiHash?: string;
     supabaseUrl: string;
     supabaseAnonKey: string;
+    gebetaApiKey?: string;
   }) {
     this.channelId = config.channelId || 'eeuethiopia';
     this.apiId = config.apiId || '28797551';
@@ -57,6 +58,7 @@ export class TelegramIngestionService {
     this.geocodingService = new GeocodingService({
       supabaseUrl: this.supabaseUrl,
       supabaseAnonKey: this.supabaseAnonKey,
+      gebetaApiKey: config.gebetaApiKey || process.env.GEBETA_MAPS_API_KEY,
     });
   }
 

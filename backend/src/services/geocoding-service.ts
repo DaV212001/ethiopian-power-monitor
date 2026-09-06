@@ -3,8 +3,9 @@
  * Hybrid multi-tier architecture:
  *   Tier 1: 0ms In-Memory Verified Addis Ababa Landmark Gazetteer
  *   Tier 2: Persistent Supabase `landmarks_cache` Table
- *   Tier 3: Free OpenStreetMap Nominatim API (Rate-Limited to 1 req/s, Bounded to Addis Ababa)
- *   Tier 4: PostGIS ST_Contains Point-in-Polygon Resolution (find_woreda_by_coords)
+ *   Tier 3: Gebeta Maps API (Specialized Ethiopian Geocoding & Landmark Engine)
+ *   Tier 4: Free OpenStreetMap Nominatim API (Fallback with 1 req/s rate-limiting)
+ *   Tier 5: PostGIS ST_Contains Point-in-Polygon Resolution (find_woreda_by_coords)
  */
 
 import rawGazetteer from '../data/addis-landmarks.json';
@@ -24,18 +25,24 @@ export interface ResolvedLandmark {
   full_name_am?: string | null;
   is_addis_ababa: boolean;
   region_name?: string;
-  source: 'GAZETTEER' | 'DB_CACHE' | 'OSM_NOMINATIM';
+  source: 'GAZETTEER' | 'DB_CACHE' | 'GEBETA_MAPS' | 'OSM_NOMINATIM';
 }
 
 export class GeocodingService {
   private supabaseUrl: string;
   private supabaseAnonKey: string;
+  private gebetaApiKey?: string;
   private memoryCache: Map<string, ResolvedLandmark> = new Map();
   private static lastOsmTimestamp: number = 0;
 
-  constructor(config: { supabaseUrl: string; supabaseAnonKey: string }) {
+  constructor(config: {
+    supabaseUrl: string;
+    supabaseAnonKey: string;
+    gebetaApiKey?: string;
+  }) {
     this.supabaseUrl = config.supabaseUrl;
     this.supabaseAnonKey = config.supabaseAnonKey;
+    this.gebetaApiKey = config.gebetaApiKey || process.env.GEBETA_MAPS_API_KEY;
     this.initGazetteer();
   }
 
@@ -95,7 +102,45 @@ export class GeocodingService {
   }
 
   /**
-   * Rate-limited fetch to OpenStreetMap Nominatim respecting the 1 req/s usage policy
+   * Primary dynamic geocoding via Gebeta Maps API (optimized for Ethiopian & Addis Ababa entities)
+   */
+  private async fetchGebetaMaps(query: string): Promise<{ name: string; lat: number; lng: number } | null> {
+    if (!this.gebetaApiKey) return null;
+    const url = `https://mapapi.gebeta.app/api/v1/route/geocoding?name=${encodeURIComponent(
+      query
+    )}&apiKey=${encodeURIComponent(this.gebetaApiKey)}`;
+
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) {
+        console.warn(`[GeocodingService] Gebeta Maps returned HTTP ${resp.status}`);
+        return null;
+      }
+
+      const json = await resp.json();
+      if (json && Array.isArray(json.data) && json.data.length > 0) {
+        // Prioritize Addis Ababa results if available
+        const addisItem = json.data.find(
+          (d: any) => d.City && d.City.toLowerCase().includes('addis')
+        );
+        const item = addisItem || json.data[0];
+        if (item.latitude && item.longitude) {
+          return {
+            name: item.name || query,
+            lat: parseFloat(item.latitude),
+            lng: parseFloat(item.longitude),
+          };
+        }
+      }
+      return null;
+    } catch (err: any) {
+      console.warn(`[GeocodingService] Gebeta Maps query failed for "${query}":`, err.message);
+      return null;
+    }
+  }
+
+  /**
+   * Rate-limited fallback fetch to OpenStreetMap Nominatim respecting the 1 req/s usage policy
    */
   private async fetchOsmNominatim(query: string, boundedToAddis: boolean = true): Promise<any | null> {
     const now = Date.now();
@@ -183,7 +228,11 @@ export class GeocodingService {
 
   /**
    * Primary hybrid resolution function:
-   * 1. Memory Gazetteer -> 2. DB Cache -> 3. OSM Nominatim + PostGIS -> Save Cache
+   * 1. Memory Gazetteer (0ms)
+   * 2. DB Cache (2ms)
+   * 3. Gebeta Maps API (Specialized Ethiopian Geocoding)
+   * 4. OSM Nominatim (Fallback)
+   * 5. PostGIS Point-in-Polygon (find_woreda_by_coords) -> Save Cache
    */
   public async resolveLandmark(rawToken: string): Promise<ResolvedLandmark | null> {
     const clean = this.cleanToken(rawToken);
@@ -234,26 +283,52 @@ export class GeocodingService {
       console.warn(`[GeocodingService] Error querying landmarks_cache:`, err.message);
     }
 
-    // 3. Query OpenStreetMap Nominatim with Addis Ababa envelope
-    let osmResult = await this.fetchOsmNominatim(`${clean} Addis Ababa`, true);
+    let geocodeHit: {
+      name: string;
+      lat: number;
+      lng: number;
+      source: 'GEBETA_MAPS' | 'OSM_NOMINATIM';
+    } | null = null;
 
-    // If not found in Addis bbox, try general Ethiopia query to catch regional towns
-    let isAddisQuery = true;
-    if (!osmResult) {
-      osmResult = await this.fetchOsmNominatim(`${clean} Ethiopia`, false);
-      isAddisQuery = false;
+    // 3. Try Gebeta Maps API first (specialized Ethiopian Geocoding)
+    if (this.gebetaApiKey) {
+      const gebetaRes = await this.fetchGebetaMaps(clean);
+      if (gebetaRes) {
+        geocodeHit = {
+          name: gebetaRes.name,
+          lat: gebetaRes.lat,
+          lng: gebetaRes.lng,
+          source: 'GEBETA_MAPS',
+        };
+      }
     }
 
-    if (!osmResult) {
+    // 4. Fallback to OpenStreetMap Nominatim if Gebeta didn't find a match
+    if (!geocodeHit) {
+      let osmResult = await this.fetchOsmNominatim(`${clean} Addis Ababa`, true);
+      if (!osmResult) {
+        osmResult = await this.fetchOsmNominatim(`${clean} Ethiopia`, false);
+      }
+
+      if (osmResult) {
+        const displayName = osmResult.display_name || clean;
+        const nameEn = osmResult.name || displayName.split(',')[0].trim();
+        geocodeHit = {
+          name: nameEn,
+          lat: parseFloat(osmResult.lat),
+          lng: parseFloat(osmResult.lon),
+          source: 'OSM_NOMINATIM',
+        };
+      }
+    }
+
+    if (!geocodeHit) {
       return null;
     }
 
-    const lat = parseFloat(osmResult.lat);
-    const lng = parseFloat(osmResult.lon);
-    const displayName = osmResult.display_name || clean;
-    const nameEn = osmResult.name || displayName.split(',')[0].trim();
+    const { lat, lng, source, name: nameEn } = geocodeHit;
 
-    // 4. Pass coordinates to PostGIS ST_Contains point-in-polygon resolution
+    // 5. Pass coordinates to PostGIS ST_Contains point-in-polygon resolution
     const woredaMatch = await this.resolveWoredaByCoords(lat, lng);
 
     const resolved: ResolvedLandmark = {
@@ -270,11 +345,11 @@ export class GeocodingService {
       full_name_en: woredaMatch ? woredaMatch.full_name_en : null,
       full_name_am: woredaMatch ? woredaMatch.full_name_am : null,
       is_addis_ababa: Boolean(woredaMatch),
-      region_name: woredaMatch ? 'Addis Ababa' : (osmResult.address?.state || 'Regional'),
-      source: 'OSM_NOMINATIM',
+      region_name: woredaMatch ? 'Addis Ababa' : 'Regional',
+      source,
     };
 
-    // 5. Cache result in Supabase `landmarks_cache`
+    // 6. Cache result in Supabase `landmarks_cache`
     try {
       await fetch(`${this.supabaseUrl}/rest/v1/landmarks_cache`, {
         method: 'POST',
@@ -297,7 +372,7 @@ export class GeocodingService {
           subcity_am: resolved.subcity_am,
           full_name_en: resolved.full_name_en,
           full_name_am: resolved.full_name_am,
-          source: 'OSM_NOMINATIM',
+          source,
         }),
       });
     } catch (err: any) {
