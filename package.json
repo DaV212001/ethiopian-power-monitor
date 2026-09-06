@@ -1,0 +1,26 @@
+{
+  "name": "ethiopian-power-monitor",
+  "version": "1.0.0",
+  "description": "Addis Ababa Electricity Outage Intelligence & Scheduled Maintenance Map Platform",
+  "private": true,
+  "scripts": {
+    "start": "node backend/dist/server.js",
+    "dev": "npx tsx watch backend/src/server.ts",
+    "build": "npx tsc -p backend/tsconfig.json",
+    "test": "npx tsx tests/test_full_stack.ts",
+    "test:extractor": "npx tsx tests/test_amharic_extractor.ts",
+    "test:ingestion": "npx tsx tests/test_telegram_ingestion.ts",
+    "test:status": "npx tsx tests/test_status_engine.ts",
+    "import:aa-woredas": "python gis/import_woredas.py && python gis/seed_database.py"
+  },
+  "keywords": [
+    "ethiopia",
+    "addis-ababa",
+    "power-outage",
+    "eeu",
+    "postgis",
+    "civic-tech"
+  ],
+  "author": "Ethiopian Power Monitor Team",
+  "license": "MIT"
+}

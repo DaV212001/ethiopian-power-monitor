@@ -1,0 +1,16 @@
+{
+  "name": "Ethiopian Power Monitor",
+  "short_name": "Power Monitor",
+  "description": "Real-time electricity outage intelligence and scheduled maintenance map for Addis Ababa, Ethiopia",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#eab308",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
