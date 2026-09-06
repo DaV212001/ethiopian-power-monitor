@@ -269,6 +269,45 @@ export async function buildApp(): Promise<FastifyInstance> {
     }
   );
 
+  app.get(
+    '/api/v1/landmarks/lookup',
+    {
+      schema: {
+        description: 'Dynamically geocode a landmark or neighborhood in Addis Ababa using OpenStreetMap and PostGIS',
+        tags: ['Map'],
+        querystring: {
+          type: 'object',
+          required: ['q'],
+          properties: {
+            q: { type: 'string', description: 'Landmark or neighborhood name in Amharic or English' },
+          },
+        },
+      },
+    },
+    async (request: FastifyRequest<{ Querystring: { q: string } }>, reply) => {
+      const q = request.query.q;
+      if (!q || q.trim().length === 0) {
+        return reply.status(400).send({ error: 'Query parameter q is required' });
+      }
+
+      const geocodingService = ingestionService.getGeocodingService();
+      const resolved = await geocodingService.resolveLandmark(q);
+
+      if (!resolved) {
+        return reply.status(404).send({
+          found: false,
+          query: q,
+          message: 'Location could not be geocoded within Addis Ababa or Ethiopia.',
+        });
+      }
+
+      return {
+        found: true,
+        data: resolved,
+      };
+    }
+  );
+
   // ==================== OUTAGES ROUTES ====================
 
   app.get(

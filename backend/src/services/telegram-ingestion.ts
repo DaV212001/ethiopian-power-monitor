@@ -6,6 +6,7 @@
 
 import crypto from 'crypto';
 import { extractOutageFromText, ExtractedOutage } from './amharic-extractor';
+import { GeocodingService } from './geocoding-service';
 
 export interface TelegramRawMessage {
   id: string;
@@ -39,6 +40,7 @@ export class TelegramIngestionService {
   private apiHash: string;
   private supabaseUrl: string;
   private supabaseAnonKey: string;
+  private geocodingService: GeocodingService;
 
   constructor(config: {
     channelId?: string;
@@ -52,6 +54,14 @@ export class TelegramIngestionService {
     this.apiHash = config.apiHash || '4a32bdbf9ca0c89cc53af784e4a80551';
     this.supabaseUrl = config.supabaseUrl;
     this.supabaseAnonKey = config.supabaseAnonKey;
+    this.geocodingService = new GeocodingService({
+      supabaseUrl: this.supabaseUrl,
+      supabaseAnonKey: this.supabaseAnonKey,
+    });
+  }
+
+  public getGeocodingService(): GeocodingService {
+    return this.geocodingService;
   }
 
   public async processAnnouncement(msg: TelegramRawMessage): Promise<IngestionResult> {
@@ -167,6 +177,65 @@ export class TelegramIngestionService {
     } else {
       // 6. Multi-Block Outage Creation: Loop through all extracted schedule blocks
       for (const block of extracted.blocks) {
+        // Dynamic geocoding fallback for tokens not matched in static gazetteer
+        const existingLandmarkNames = new Set(
+          (block.landmarks || []).map((l) => l.name_am.toLowerCase())
+        );
+
+        for (const rawToken of block.location_tokens) {
+          const clean = this.geocodingService.cleanToken(rawToken);
+          if (!clean || clean.length < 2 || existingLandmarkNames.has(clean.toLowerCase())) {
+            continue;
+          }
+
+          try {
+            const resolved = await this.geocodingService.resolveLandmark(rawToken);
+            if (resolved && resolved.is_addis_ababa && resolved.woreda_id) {
+              existingLandmarkNames.add(clean.toLowerCase());
+              if (!block.landmarks) block.landmarks = [];
+              block.landmarks.push({
+                name_en: resolved.name_en,
+                name_am: resolved.name_am,
+                lng: resolved.lng,
+                lat: resolved.lat,
+                woreda_id: resolved.woreda_id,
+                woreda_number: resolved.woreda_number || '',
+                subcity_id: resolved.subcity_id || 0,
+                subcity_en: resolved.subcity_en || 'Addis Ababa',
+                subcity_am: resolved.subcity_am || 'አዲስ አበባ',
+                full_name_en: resolved.full_name_en || undefined,
+                full_name_am: resolved.full_name_am || undefined,
+              });
+
+              // Add to addis_targets if not already present
+              let targetGroup = block.addis_targets.find((t) => t.subcity_id === resolved.subcity_id);
+              if (!targetGroup) {
+                targetGroup = {
+                  subcity_id: resolved.subcity_id || 0,
+                  subcity_en: resolved.subcity_en || 'Addis Ababa',
+                  subcity_am: resolved.subcity_am || 'አዲስ አበባ',
+                  woreda_numbers: [],
+                  neighborhood: resolved.name_en,
+                };
+                block.addis_targets.push(targetGroup);
+              }
+              if (resolved.woreda_number && !targetGroup.woreda_numbers.includes(resolved.woreda_number)) {
+                targetGroup.woreda_numbers.push(resolved.woreda_number);
+              }
+              if (resolved.woreda_number && !block.all_woredas.includes(resolved.woreda_number)) {
+                block.all_woredas.push(resolved.woreda_number);
+              }
+              block.is_addis_ababa = true;
+            } else if (resolved && !resolved.is_addis_ababa) {
+              if (!block.region_name && resolved.region_name) {
+                block.region_name = resolved.region_name;
+              }
+            }
+          } catch (geoErr) {
+            console.warn(`[TelegramIngestionService] Geocoding lookup failed for token "${rawToken}":`, geoErr);
+          }
+        }
+
         const hasLocations = block.addis_targets.length > 0 || block.location_tokens.length > 0 || block.all_woredas.length > 0;
         if (!hasLocations && extracted.blocks.length > 1) {
           continue;
