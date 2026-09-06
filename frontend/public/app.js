@@ -260,6 +260,15 @@ function initNavigation() {
       switchView(target);
     });
   });
+
+  const detailModal = document.getElementById('detailModal');
+  if (detailModal) {
+    detailModal.addEventListener('click', (e) => {
+      if (e.target === detailModal) {
+        detailModal.classList.add('hidden');
+      }
+    });
+  }
 }
 
 function switchView(viewName) {
@@ -571,6 +580,16 @@ function formatEthiopianTime(isoStr) {
     en: `${ethHours}:${minutes} ${periodEn}`,
     civil: `${String(eatHours).padStart(2, '0')}:${minutes} EAT`
   };
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 // Open detailed modal for an affected or selected Woreda

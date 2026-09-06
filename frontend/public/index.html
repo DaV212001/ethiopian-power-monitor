@@ -279,9 +279,14 @@
           <h3 id="modalTitle" class="text-lg font-bold text-white">Bole Woreda 03</h3>
           <p id="modalSubcity" class="text-xs text-slate-400">Bole Sub-city</p>
         </div>
-        <span id="modalStatusBadge" class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-900/60 text-emerald-300 border border-emerald-700">
-          Normal
-        </span>
+        <div class="flex items-center gap-2">
+          <span id="modalStatusBadge" class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-900/60 text-emerald-300 border border-emerald-700">
+            Normal
+          </span>
+          <button type="button" onclick="document.getElementById('detailModal').classList.add('hidden')" class="text-slate-400 hover:text-white p-1 text-base leading-none transition">
+            ✕
+          </button>
+        </div>
       </div>
 
       <div class="space-y-3 pt-2 text-sm text-slate-300 border-t border-slate-800">
