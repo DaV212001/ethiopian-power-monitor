@@ -63,6 +63,10 @@ const I18N = {
     status_concluded: 'Concluded',
     no_history_outages: 'No concluded historical outages recorded.',
     quoted_telegram_title: 'Quoted Official Telegram Announcement',
+    quoted_specific_point: 'Quoted Point in Announcement',
+    view_full_announcement: 'View full announcement text',
+    copy_keyword_btn: 'Copy Keyword to Search in Telegram',
+    copied_btn: 'Copied! Press Ctrl+F in Telegram',
     show_embed: 'Show Embed ▾',
     hide_embed: 'Hide Embed ▴',
   },
@@ -123,6 +127,10 @@ const I18N = {
     status_concluded: 'የተጠናቀቀ',
     no_history_outages: 'የተመዘገበ ያለፈ መቋረጥ የለም።',
     quoted_telegram_title: 'የቴሌግራም ይፋዊ ማስታወቂያ ጽሑፍ',
+    quoted_specific_point: 'የተጠቀሰው የማስታወቂያው ክፍል',
+    view_full_announcement: 'ሙሉውን ማስታወቂያ ጽሑፍ ይመልከቱ',
+    copy_keyword_btn: 'በቴሌግራም ለመፈለግ ቃሉን ቅዳ',
+    copied_btn: 'ተቀድቷል! በቴሌግራም Ctrl+F ተጭነው ይፈልጉ',
     show_embed: 'ማስታወቂያውን አሳይ ▾',
     hide_embed: 'ማስታወቂያውን ደብቅ ▴',
   },
@@ -639,16 +647,71 @@ function openWoredaDetailModal(properties, statusInfo) {
 
   // Quoted Official Announcement & Embed
   const quoteBox = document.getElementById('modalQuoteBox');
+  const quoteTimeHeader = document.getElementById('modalQuoteTimeHeader');
+  const quoteSnippet = document.getElementById('modalQuoteSnippet');
   const quoteText = document.getElementById('modalQuoteText');
+  const fullTextDetails = document.getElementById('modalFullTextDetails');
+  const copySearchBtn = document.getElementById('modalCopySearchBtn');
+  const copySearchLabel = document.getElementById('modalCopySearchLabel');
   const toggleEmbedBtn = document.getElementById('modalToggleEmbedBtn');
   const toggleEmbedLabel = document.getElementById('modalToggleEmbedLabel');
   const embedWrapper = document.getElementById('modalEmbedWrapper');
   const telegramIframe = document.getElementById('modalTelegramIframe');
+  const sourceLink = document.getElementById('modalSourceLink');
+  const sourceLinkFallback = document.getElementById('modalSourceLinkFallback');
+  const sourceLinkBox = document.getElementById('modalSourceLinkBox');
 
-  if (quoteBox && quoteText) {
+  if (quoteBox) {
     if (statusInfo && statusInfo.raw_text) {
-      quoteText.textContent = statusInfo.raw_text.trim();
+      const searchKeywords = [
+        properties.full_name_am,
+        properties.subcity_am,
+        properties.woreda_num ? `ወረዳ ${properties.woreda_num}` : '',
+        properties.woreda_num ? `ወረዳ ${parseInt(properties.woreda_num, 10)}` : '',
+        ...(SUBCITY_LANDMARKS[properties.subcity_id] || []),
+        ...(statusInfo.affected_locations_raw || []),
+      ].filter(Boolean);
+
+      const targetQuote = extractTargetQuote(statusInfo.raw_text, searchKeywords);
+
+      if (quoteTimeHeader) {
+        quoteTimeHeader.textContent = targetQuote && targetQuote.timeHeader ? targetQuote.timeHeader : '';
+      }
+      if (quoteSnippet) {
+        quoteSnippet.innerHTML = targetQuote && targetQuote.highlightedLine
+          ? targetQuote.highlightedLine
+          : escapeHtml(statusInfo.raw_text);
+      }
+      if (quoteText) {
+        quoteText.textContent = statusInfo.raw_text.trim();
+      }
+      if (fullTextDetails) {
+        fullTextDetails.classList.remove('hidden');
+        fullTextDetails.removeAttribute('open');
+      }
+
+      // Copy Search Keyword helper
+      if (targetQuote && targetQuote.keyword && copySearchBtn && copySearchLabel) {
+        copySearchLabel.textContent = `📋 Copy "${targetQuote.keyword}"`;
+        copySearchBtn.classList.remove('hidden');
+        copySearchBtn.onclick = (e) => {
+          e.preventDefault();
+          copyToClipboard(targetQuote.keyword, copySearchBtn);
+        };
+      } else if (copySearchBtn) {
+        copySearchBtn.classList.add('hidden');
+      }
+
+      // Telegram source link with text fragment
+      if (sourceLink && statusInfo.source_url) {
+        const textFragment = targetQuote && targetQuote.keyword
+          ? `#:~:text=${encodeURIComponent(targetQuote.keyword)}`
+          : '';
+        sourceLink.href = `${statusInfo.source_url}${textFragment}`;
+      }
+
       quoteBox.classList.remove('hidden');
+      if (sourceLinkBox) sourceLinkBox.classList.add('hidden');
 
       if (embedWrapper) embedWrapper.classList.add('hidden');
       if (toggleEmbedLabel) toggleEmbedLabel.textContent = t('show_embed');
@@ -677,18 +740,14 @@ function openWoredaDetailModal(properties, statusInfo) {
     } else {
       quoteBox.classList.add('hidden');
       if (telegramIframe) telegramIframe.src = '';
-    }
-  }
-
-  // Telegram Source Link
-  const sourceLinkBox = document.getElementById('modalSourceLinkBox');
-  const sourceLink = document.getElementById('modalSourceLink');
-  if (sourceLinkBox && sourceLink) {
-    if (statusInfo && statusInfo.source_url) {
-      sourceLink.href = statusInfo.source_url;
-      sourceLinkBox.classList.remove('hidden');
-    } else {
-      sourceLinkBox.classList.add('hidden');
+      if (sourceLinkBox && sourceLinkFallback) {
+        if (statusInfo && statusInfo.source_url) {
+          sourceLinkFallback.href = statusInfo.source_url;
+          sourceLinkBox.classList.remove('hidden');
+        } else {
+          sourceLinkBox.classList.add('hidden');
+        }
+      }
     }
   }
 
@@ -778,52 +837,131 @@ function initSearch() {
   });
 }
 
-function escapeHtml(str) {
-  if (!str) return '';
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-window.toggleEmbedIframe = function (wrapperId, sourceUrl, btnId) {
-  const wrapper = document.getElementById(wrapperId);
-  const btn = document.getElementById(btnId);
-  if (!wrapper) return;
-  const iframe = wrapper.querySelector('iframe');
-  const isHidden = wrapper.classList.contains('hidden');
-  if (isHidden) {
-    if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === window.location.href)) {
-      const embedUrl =
-        iframe.getAttribute('data-src') ||
-        (sourceUrl.includes('?') ? `${sourceUrl}&embed=1` : `${sourceUrl}?embed=1`);
-      iframe.src = embedUrl;
-    }
-    wrapper.classList.remove('hidden');
-    if (btn) btn.textContent = t('hide_embed');
-  } else {
-    wrapper.classList.add('hidden');
-    if (btn) btn.textContent = t('show_embed');
-  }
+const SUBCITY_LANDMARKS = {
+  1: ['መርካቶ', 'አውቶቡስ ተራ', 'አዲስ ከተማ'],
+  2: ['ኮዬ', 'ኮዬ ፈጬ', 'ፕሮጀክት 16', 'ፕሮጀክት 12', 'ፕሮጀክት 17', 'ቃሊቲ', 'አቃቂ'],
+  3: ['አራዳ', 'ፒያሳ'],
+  4: ['ቦሌ', 'ጎሮ', 'ሰሚት', 'ገርጂ', 'ጃፓን'],
+  5: ['ጉለሌ', 'ሸክላ ሰፈር', 'ሽሮ ሜዳ'],
+  6: ['ቂርቆስ', 'ቄራ', 'ጎተራ', 'ካዛንቺስ', 'መስቀል አደባባይ'],
+  7: ['ኮልፌ', 'ቀራኒዮ', 'ቡራዩ', 'ጽርሐ ጽዮን', 'በግ ተራ', 'ጦር ኃይሎች'],
+  8: ['ልደታ', 'ሜክሲኮ', 'ባልቻ'],
+  9: ['ንፋስ ስልክ', 'ላፍቶ', 'መካኒሳ', 'ጎፋ', 'ጎፋ ካምፕ', 'ቆሬ', 'ፋና', 'አሚጎ', 'ጀሞ', 'ሌቡ', 'ሳሪስ'],
+  10: ['የካ', 'አያት', 'መገናኛ', 'ኮተቤ'],
 };
 
-function renderQuotedAnnouncementSection(rawText, sourceUrl, uniqueId) {
+window.copyToClipboard = function (text, btn) {
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `✅ Copied "${escapeHtml(text)}"`;
+    btn.classList.remove('bg-sky-950', 'text-sky-300', 'border-sky-700/70', 'bg-slate-800', 'text-amber-400', 'border-slate-700');
+    btn.classList.add('bg-emerald-900', 'text-emerald-300', 'border-emerald-600');
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+      btn.classList.remove('bg-emerald-900', 'text-emerald-300', 'border-emerald-600');
+      btn.classList.add('bg-sky-950', 'text-sky-300', 'border-sky-700/70');
+    }, 2500);
+  });
+};
+
+function highlightKeywordInLine(line, keyword) {
+  const safeLine = escapeHtml(line);
+  if (!keyword) return safeLine;
+  const safeKw = escapeHtml(keyword);
+  const regex = new RegExp(`(${safeKw})`, 'gi');
+  return safeLine.replace(
+    regex,
+    '<mark class="bg-amber-400 text-slate-950 font-bold px-1 py-0.5 rounded shadow-sm">$1</mark>'
+  );
+}
+
+function extractTargetQuote(rawText, searchKeywords = []) {
+  if (!rawText) return null;
+  const lines = rawText.split('\n').map((l) => l.trim()).filter(Boolean);
+  let currentTimeHeader = '';
+  let bestMatch = null;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (/(?:✅|ከ).*?(?:ጠዋት|ጥዋት|ቀን|ምሽት|\d).*?(?:እስከ|-)/i.test(line)) {
+      currentTimeHeader = line;
+      continue;
+    }
+
+    // Skip boilerplate intros / outros
+    if (/^(?:ስለሆነም|በአካባቢው|ክቡራን|ይህንኑ|በአክብሮት|እናሳውቃለን|#)/i.test(line)) {
+      continue;
+    }
+
+    for (const kw of searchKeywords) {
+      if (!kw || kw.length < 2) continue;
+      const cleanKw = kw.replace(/^[በከወ\s]+/, '').trim();
+      if (cleanKw.length >= 2 && line.includes(cleanKw)) {
+        bestMatch = {
+          timeHeader: currentTimeHeader,
+          line: line,
+          keyword: cleanKw,
+          highlightedLine: highlightKeywordInLine(line, cleanKw),
+        };
+        break;
+      }
+    }
+    if (bestMatch) break;
+  }
+
+  if (!bestMatch) {
+    const contentLine = lines.find(
+      (l) =>
+        l.startsWith('👉') ||
+        (!l.startsWith('✅') &&
+          !l.startsWith('የጥገና') &&
+          !l.startsWith('ነገ') &&
+          !l.startsWith('#') &&
+          !l.startsWith('ስለሆነም'))
+    );
+    if (contentLine) {
+      bestMatch = {
+        timeHeader: currentTimeHeader || lines.find((l) => l.startsWith('✅') || l.includes('ከጠዋቱ')) || '',
+        line: contentLine,
+        keyword: '',
+        highlightedLine: escapeHtml(contentLine),
+      };
+    }
+  }
+
+  return bestMatch;
+}
+
+function renderQuotedAnnouncementSection(rawText, sourceUrl, uniqueId, searchKeywords = []) {
   if (!rawText) return '';
-  const escapedText = escapeHtml(rawText.trim());
+  const escapedFullText = escapeHtml(rawText.trim());
   const embedId = `embed-box-${uniqueId}`;
   const btnId = `embed-btn-${uniqueId}`;
+  const targetQuote = extractTargetQuote(rawText, searchKeywords);
+
+  const textFragment =
+    targetQuote && targetQuote.keyword ? `#:~:text=${encodeURIComponent(targetQuote.keyword)}` : '';
+  const directLink = sourceUrl ? `${sourceUrl}${textFragment}` : '';
+
+  const copyKeywordBtn =
+    targetQuote && targetQuote.keyword
+      ? `<button type="button" onclick="copyToClipboard('${escapeHtml(
+          targetQuote.keyword
+        )}', this)" class="text-[11px] px-2 py-0.5 rounded bg-sky-950 hover:bg-sky-900 text-sky-300 border border-sky-700/70 transition font-medium">
+           📋 Copy "${escapeHtml(targetQuote.keyword)}"
+         </button>`
+      : '';
 
   const embedControls = sourceUrl
     ? `
       <div class="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-xs">
+        <a href="${directLink}" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:text-sky-300 underline font-semibold flex items-center gap-1">
+          <span>Open in Telegram ↗</span>
+        </a>
         <button id="${btnId}" type="button" onclick="toggleEmbedIframe('${embedId}', '${sourceUrl}', '${btnId}')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-medium transition">
           ${t('show_embed')}
         </button>
-        <a href="${sourceUrl}" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:text-sky-300 underline font-medium">
-          Telegram ↗
-        </a>
       </div>
       <div id="${embedId}" class="hidden pt-2">
         <iframe src="" data-src="${
@@ -834,19 +972,37 @@ function renderQuotedAnnouncementSection(rawText, sourceUrl, uniqueId) {
     : '';
 
   return `
-    <details class="mt-3 group bg-slate-900/80 border border-slate-700/80 rounded-xl p-3">
-      <summary class="cursor-pointer text-xs font-semibold text-sky-400 flex items-center justify-between select-none hover:text-sky-300 transition">
-        <span class="flex items-center gap-1.5">
-          <span>💬</span>
-          <span>${t('quoted_telegram_title')}</span>
+    <div class="mt-3 bg-slate-900/90 border border-slate-700/90 rounded-xl p-3 space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+          <span>🎯</span>
+          <span>${t('quoted_specific_point')}</span>
         </span>
-        <span class="text-slate-400 text-[10px] transform group-open:rotate-180 transition-transform duration-200">▼</span>
-      </summary>
-      <blockquote class="mt-2 text-xs text-slate-200 border-l-2 border-amber-400 pl-3 py-1 font-mono whitespace-pre-line max-h-48 overflow-y-auto leading-relaxed bg-slate-950/60 rounded-r-lg">
-${escapedText}
-      </blockquote>
+        ${copyKeywordBtn}
+      </div>
+
+      <div class="text-xs text-slate-200 border-l-2 border-amber-400 pl-3 py-1 font-mono whitespace-pre-line leading-relaxed bg-slate-950/60 rounded-r-lg">
+        ${
+          targetQuote && targetQuote.timeHeader
+            ? `<div class="text-amber-400 font-bold mb-1">${escapeHtml(targetQuote.timeHeader)}</div>`
+            : ''
+        }
+        <div class="text-slate-100">${
+          targetQuote && targetQuote.highlightedLine ? targetQuote.highlightedLine : escapedFullText
+        }</div>
+      </div>
+
+      <details class="group text-[11px] text-slate-400">
+        <summary class="cursor-pointer select-none text-slate-400 hover:text-slate-300 font-medium">
+          <span>${t('view_full_announcement')} ▾</span>
+        </summary>
+        <blockquote class="mt-1.5 text-[11px] text-slate-300 border-l border-slate-700 pl-2.5 py-1 font-mono whitespace-pre-line max-h-32 overflow-y-auto leading-relaxed bg-slate-950/40 rounded-r">
+${escapedFullText}
+        </blockquote>
+      </details>
+
       ${embedControls}
-    </details>
+    </div>
   `;
 }
 
@@ -965,7 +1121,14 @@ function renderOutagesList() {
           ${areas.length > 0 ? `<span>📍 ${areas.length} Woreda(s) affected</span>` : `<span>📍 Regional Town / Grid Substation</span>`}
           ${isHistory && o.scheduled_end ? `<span>🏁 Concluded at ${civilTimeDisplay.split('–')[1] || civilTimeDisplay}</span>` : ''}
         </div>
-        ${renderQuotedAnnouncementSection(o.raw_text, o.source_url, `list-${o.id}`)}
+        ${(() => {
+          const searchKeywords = [
+            o.region_name,
+            ...(Array.isArray(o.affected_locations_raw) ? o.affected_locations_raw : [o.affected_locations_raw]),
+            ...(areas.map((a) => a.woredas?.full_name_am || a.woredas?.full_name_en)),
+          ].filter(Boolean);
+          return renderQuotedAnnouncementSection(o.raw_text, o.source_url, `list-${o.id}`, searchKeywords);
+        })()}
       </div>
     `;
     })
@@ -1032,7 +1195,14 @@ function renderCalendar() {
                   currentLang === 'am' ? s.reason_am || s.reason : s.reason || 'Maintenance'
                 }</div>
               </div>
-              ${renderQuotedAnnouncementSection(s.raw_text, s.source_url, `cal-${s.id}`)}
+              ${(() => {
+                const calKeywords = [
+                  s.region_name,
+                  ...(Array.isArray(s.affected_locations_raw) ? s.affected_locations_raw : [s.affected_locations_raw]),
+                  ...((s.outage_areas || []).map((a) => a.woredas?.full_name_am || a.woredas?.full_name_en)),
+                ].filter(Boolean);
+                return renderQuotedAnnouncementSection(s.raw_text, s.source_url, `cal-${s.id}`, calKeywords);
+              })()}
               <div class="mt-4 pt-3 border-t border-slate-700/60 flex items-center justify-between text-xs text-slate-400">
                 ${s.source_url ? `<a href="${s.source_url}" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:text-sky-300 font-semibold underline flex items-center gap-1"><span>Telegram Post</span><span>↗</span></a>` : `<span>Source: EEU Official</span>`}
                 <span class="text-emerald-400">Scheduled Ahead</span>
@@ -1099,7 +1269,14 @@ function renderCalendarHistory() {
             <div class="text-xs text-white font-medium mb-1">${displayArea}</div>
             <div class="text-[11px] text-slate-400">${currentLang === 'am' ? s.reason_am || s.reason : s.reason || 'Maintenance'}</div>
           </div>
-          ${renderQuotedAnnouncementSection(s.raw_text, s.source_url, `hist-${s.id}`)}
+          ${(() => {
+            const histKeywords = [
+              s.region_name,
+              ...(Array.isArray(s.affected_locations_raw) ? s.affected_locations_raw : [s.affected_locations_raw]),
+              ...((s.outage_areas || []).map((a) => a.woredas?.full_name_am || a.woredas?.full_name_en)),
+            ].filter(Boolean);
+            return renderQuotedAnnouncementSection(s.raw_text, s.source_url, `hist-${s.id}`, histKeywords);
+          })()}
           <div class="mt-3 pt-2 border-t border-slate-700/40 flex items-center justify-between text-[11px] text-slate-400">
             ${s.source_url ? `<a href="${s.source_url}" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:text-sky-300 underline flex items-center gap-1"><span>Telegram</span><span>↗</span></a>` : `<span>EEU Official</span>`}
             <span class="text-slate-500 font-mono text-[10px]">CAPPED HISTORY</span>

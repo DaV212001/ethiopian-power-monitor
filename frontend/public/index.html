@@ -307,29 +307,49 @@
           <div id="modalSource" class="text-sm text-slate-200 mt-0.5">EEU Official Announcement</div>
         </div>
 
-        <!-- Quoted Official Announcement & Embed -->
-        <div id="modalQuoteBox" class="hidden rounded-xl bg-slate-950/80 border border-slate-700/80 p-3.5 space-y-2">
+        <!-- Quoted Official Announcement Point & Embed -->
+        <div id="modalQuoteBox" class="hidden rounded-xl bg-slate-950/80 border border-slate-700/80 p-3.5 space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-sky-400 flex items-center gap-1.5">
-              <span>💬</span>
-              <span data-i18n="quoted_telegram_title">Quoted Official Telegram Announcement</span>
+            <span class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+              <span>🎯</span>
+              <span data-i18n="quoted_specific_point">Quoted Point in Announcement</span>
             </span>
+            <button id="modalCopySearchBtn" type="button" class="hidden text-[11px] px-2 py-0.5 rounded bg-sky-950 hover:bg-sky-900 text-sky-300 border border-sky-700/70 transition font-medium">
+              <span id="modalCopySearchLabel">📋 Copy Keyword</span>
+            </button>
+          </div>
+          
+          <div id="modalQuotePointContainer" class="text-xs text-slate-200 border-l-2 border-amber-400 pl-3 py-1 font-mono whitespace-pre-line leading-relaxed bg-slate-900/60 rounded-r-lg">
+            <div id="modalQuoteTimeHeader" class="text-amber-400 font-bold mb-1"></div>
+            <div id="modalQuoteSnippet" class="text-slate-100"></div>
+          </div>
+
+          <!-- Collapsible full announcement if user wants context -->
+          <details id="modalFullTextDetails" class="hidden group text-[11px] text-slate-400">
+            <summary class="cursor-pointer select-none text-slate-400 hover:text-slate-300 font-medium">
+              <span data-i18n="view_full_announcement">View Full Post Text</span> ▾
+            </summary>
+            <blockquote id="modalQuoteText" class="mt-1.5 text-[11px] text-slate-300 border-l border-slate-700 pl-2.5 py-1 font-mono whitespace-pre-line max-h-32 overflow-y-auto leading-relaxed bg-slate-900/40 rounded-r">
+            </blockquote>
+          </details>
+
+          <div class="flex items-center justify-between pt-1 border-t border-slate-800 text-xs">
+            <a id="modalSourceLink" href="#" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:text-sky-300 font-semibold underline flex items-center gap-1">
+              <span>Open in Telegram ↗</span>
+            </a>
             <button id="modalToggleEmbedBtn" type="button" class="text-[11px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 transition">
               <span id="modalToggleEmbedLabel">Show Embed ▾</span>
             </button>
           </div>
-          
-          <blockquote id="modalQuoteText" class="text-xs text-slate-200 border-l-2 border-amber-400 pl-3 py-1 font-mono whitespace-pre-line max-h-40 overflow-y-auto leading-relaxed bg-slate-900/50 rounded-r-lg">
-          </blockquote>
 
-          <div id="modalEmbedWrapper" class="hidden pt-2">
+          <div id="modalEmbedWrapper" class="hidden pt-1">
             <iframe id="modalTelegramIframe" src="" class="w-full h-64 rounded-xl border border-slate-700/80 bg-slate-900" frameborder="0" loading="lazy"></iframe>
           </div>
         </div>
 
         <div id="modalSourceLinkBox" class="hidden">
           <div class="text-xs font-semibold text-slate-400">Original Announcement</div>
-          <a id="modalSourceLink" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs text-sky-400 hover:text-sky-300 font-medium mt-1 underline">
+          <a id="modalSourceLinkFallback" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs text-sky-400 hover:text-sky-300 font-medium mt-1 underline">
             <span>View Original Post on Telegram ↗</span>
           </a>
         </div>
