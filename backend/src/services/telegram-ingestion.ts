@@ -188,6 +188,7 @@ export class TelegramIngestionService {
           raw_text: msg.raw_text,
           region_name: block.region_name || (block.is_addis_ababa ? 'Addis Ababa' : 'Regional'),
           affected_locations_raw: block.location_tokens.length > 0 ? block.location_tokens : (block.raw_locations_text ? [block.raw_locations_text] : []),
+          landmarks: block.landmarks || [],
         };
 
         const insertOutageUrl = `${this.supabaseUrl}/rest/v1/outages`;
@@ -215,6 +216,7 @@ export class TelegramIngestionService {
               woreda_id: number;
               subcity_id: number;
               specific_neighborhoods: string[];
+              landmarks: any[];
             }> = [];
 
             for (const target of block.addis_targets) {
@@ -231,11 +233,20 @@ export class TelegramIngestionService {
               const woredasFound = await woredaRes.json();
               if (Array.isArray(woredasFound)) {
                 for (const wf of woredasFound) {
+                  const targetLandmarks = (block.landmarks || []).filter(
+                    (l) =>
+                      l.woreda_id === wf.id ||
+                      l.woreda_number === wf.woreda_number ||
+                      (l.woreda_number &&
+                        wf.woreda_number &&
+                        parseInt(l.woreda_number, 10) === parseInt(wf.woreda_number, 10))
+                  );
                   areaLinks.push({
                     outage_id: blockOutageId,
                     woreda_id: wf.id,
                     subcity_id: target.subcity_id,
                     specific_neighborhoods: [target.neighborhood, ...block.location_tokens.slice(0, 5)],
+                    landmarks: targetLandmarks,
                   });
                 }
               }

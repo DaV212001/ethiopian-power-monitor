@@ -1,0 +1,1520 @@
+[
+  {
+    "name_en": "Mekanisa",
+    "name_am": "መካኒሳ",
+    "coordinates": [
+      38.7305,
+      8.9719
+    ],
+    "woreda_id": 25,
+    "woreda_number": "02",
+    "subcity_id": 9,
+    "subcity_en": "Nefas - Silk Lafto",
+    "subcity_am": "ንፋስ ስልክ ላፍቶ",
+    "full_name_en": "Nefas - Silk Lafto Woreda 02",
+    "full_name_am": "ንፋስ ስልክ ላፍቶ ወረዳ 02",
+    "patterns": [
+      "መካኒሳ",
+      "mekanisa"
+    ]
+  },
+  {
+    "name_en": "Amigo Condominium",
+    "name_am": "አሚጎ ኮንዶሚንየም",
+    "coordinates": [
+      38.728,
+      8.974
+    ],
+    "woreda_id": 25,
+    "woreda_number": "02",
+    "subcity_id": 9,
+    "subcity_en": "Nefas - Silk Lafto",
+    "subcity_am": "ንፋስ ስልክ ላፍቶ",
+    "full_name_en": "Nefas - Silk Lafto Woreda 02",
+    "full_name_am": "ንፋስ ስልክ ላፍቶ ወረዳ 02",
+    "patterns": [
+      "አሚጎ",
+      "amigo"
+    ]
+  },
+  {
+    "name_en": "Mekanisa Areke Fabrika",
+    "name_am": "መካኒሳ አረቄ ፋብሪካ",
+    "coordinates": [
+      38.7315,
+      8.9705
+    ],
+    "woreda_id": 25,
+    "woreda_number": "02",
+    "subcity_id": 9,
+    "subcity_en": "Nefas - Silk Lafto",
+    "subcity_am": "ንፋስ ስልክ ላፍቶ",
+    "full_name_en": "Nefas - Silk Lafto Woreda 02",
+    "full_name_am": "ንፋስ ስልክ ላፍቶ ወረዳ 02",
+    "patterns": [
+      "አረቄ\\s*ፋብሪካ"
+    ]
+  },
+  {
+    "name_en": "Gofa Camp",
+    "name_am": "ጎፋ ካምፕ",
+    "coordinates": [
+      38.7402,
+      8.9694
+    ],
+    "woreda_id": 29,
+    "woreda_number": "06",
+    "subcity_id": 9,
+    "subcity_en": "Nefas - Silk Lafto",
+    "subcity_am": "ንፋስ ስልክ ላፍቶ",
+    "full_name_en": "Nefas - Silk Lafto Woreda 06",
+    "full_name_am": "ንፋስ ስልክ ላፍቶ ወረዳ 06",
+    "patterns": [
+      "ጎፋ\\s*ካምፕ",
+      "gofa\\s*camp"
+    ]
+  },
+  {
+    "name_en": "Kore Adebabay",
+    "name_am": "ቆሬ አደባባይ",
+    "coordinates": [
+      38.742,
+      8.9645
+    ],
+    "woreda_id": 29,
+    "woreda_number": "06",
+    "subcity_id": 9,
+    "subcity_en": "Nefas - Silk Lafto",
+    "subcity_am": "ንፋስ ስልክ ላፍቶ",
+    "full_name_en": "Nefas - Silk Lafto Woreda 06",
+    "full_name_am": "ንፋስ ስልክ ላፍቶ ወረዳ 06",
+    "patterns": [
+      "ቆሬ\\s*አደባባይ",
+      "ቆሬ"
+    ]
+  },
+  {
+    "name_en": "Fana School",
+    "name_am": "ፋና ት/ቤት",
+    "coordinates": [
+      38.7445,
+      8.968
+    ],
+    "woreda_id": 29,
+    "woreda_number": "06",
+    "subcity_id": 9,
+    "subcity_en": "Nefas - Silk Lafto",
+    "subcity_am": "ንፋስ ስልክ ላፍቶ",
+    "full_name_en": "Nefas - Silk Lafto Woreda 06",
+    "full_name_am": "ንፋስ ስልክ ላፍቶ ወረዳ 06",
+    "patterns": [
+      "ፋና\\s*ት/ቤት",
+      "ፋና"
+    ]
+  },
+  {
+    "name_en": "Hawaryaw Church",
+    "name_am": "ሀዋርያው ቸርች",
+    "coordinates": [
+      38.739,
+      8.968
+    ],
+    "woreda_id": 29,
+    "woreda_number": "06",
+    "subcity_id": 9,
+    "subcity_en": "Nefas - Silk Lafto",
+    "subcity_am": "ንፋስ ስልክ ላፍቶ",
+    "full_name_en": "Nefas - Silk Lafto Woreda 06",
+    "full_name_am": "ንፋስ ስልክ ላፍቶ ወረዳ 06",
+    "patterns": [
+      "ሀዋርያው\\s*ቸርች",
+      "ሀዋርያው"
+    ]
+  },
+  {
+    "name_en": "Kidane Mehret Church Mekanisa",
+    "name_am": "ኪዳነምህረት ቤተ ክርስቲያን",
+    "coordinates": [
+      38.741,
+      8.967
+    ],
+    "woreda_id": 29,
+    "woreda_number": "06",
+    "subcity_id": 9,
+    "subcity_en": "Nefas - Silk Lafto",
+    "subcity_am": "ንፋስ ስልክ ላፍቶ",
+    "full_name_en": "Nefas - Silk Lafto Woreda 06",
+    "full_name_am": "ንፋስ ስልክ ላፍቶ ወረዳ 06",
+    "patterns": [
+      "ኪዳነምህረት"
+    ]
+  },
+  {
+    "name_en": "Gofa Sefer",
+    "name_am": "ጎፋ ሰፈር",
+    "coordinates": [
+      38.745,
+      8.972
+    ],
+    "woreda_id": 29,
+    "woreda_number": "06",
+    "subcity_id": 9,
+    "subcity_en": "Nefas - Silk Lafto",
+    "subcity_am": "ንፋስ ስልክ ላፍቶ",
+    "full_name_en": "Nefas - Silk Lafto Woreda 06",
+    "full_name_am": "ንፋስ ስልክ ላፍቶ ወረዳ 06",
+    "patterns": [
+      "ጎፋ\\s*(?:ሰፈር|ማዞሪያ)",
+      "ጎፋ"
+    ]
+  },
+  {
+    "name_en": "Jemo",
+    "name_am": "ጀሞ",
+    "coordinates": [
+      38.7056,
+      8.9567
+    ],
+    "woreda_id": 24,
+    "woreda_number": "01",
+    "subcity_id": 9,
+    "subcity_en": "Nefas - Silk Lafto",
+    "subcity_am": "ንፋስ ስልክ ላፍቶ",
+    "full_name_en": "Nefas - Silk Lafto Woreda 01",
+    "full_name_am": "ንፋስ ስልክ ላፍቶ ወረዳ 01",
+    "patterns": [
+      "ጀሞ",
+      "jemo"
+    ]
+  },
+  {
+    "name_en": "Lebu",
+    "name_am": "ሌቡ",
+    "coordinates": [
+      38.718,
+      8.962
+    ],
+    "woreda_id": 25,
+    "woreda_number": "02",
+    "subcity_id": 9,
+    "subcity_en": "Nefas - Silk Lafto",
+    "subcity_am": "ንፋስ ስልክ ላፍቶ",
+    "full_name_en": "Nefas - Silk Lafto Woreda 02",
+    "full_name_am": "ንፋስ ስልክ ላፍቶ ወረዳ 02",
+    "patterns": [
+      "ሌቡ",
+      "lebu"
+    ]
+  },
+  {
+    "name_en": "Haile Garment",
+    "name_am": "ኃይሌ ጋርመንት",
+    "coordinates": [
+      38.712,
+      8.948
+    ],
+    "woreda_id": 24,
+    "woreda_number": "01",
+    "subcity_id": 9,
+    "subcity_en": "Nefas - Silk Lafto",
+    "subcity_am": "ንፋስ ስልክ ላፍቶ",
+    "full_name_en": "Nefas - Silk Lafto Woreda 01",
+    "full_name_am": "ንፋስ ስልክ ላፍቶ ወረዳ 01",
+    "patterns": [
+      "ኃይሌ\\s*ጋርመንት",
+      "ጋርመንት"
+    ]
+  },
+  {
+    "name_en": "Lafto",
+    "name_am": "ላፍቶ",
+    "coordinates": [
+      38.724,
+      8.952
+    ],
+    "woreda_id": 24,
+    "woreda_number": "01",
+    "subcity_id": 9,
+    "subcity_en": "Nefas - Silk Lafto",
+    "subcity_am": "ንፋስ ስልክ ላፍቶ",
+    "full_name_en": "Nefas - Silk Lafto Woreda 01",
+    "full_name_am": "ንፋስ ስልክ ላፍቶ ወረዳ 01",
+    "patterns": [
+      "ላፍቶ",
+      "lafto"
+    ]
+  },
+  {
+    "name_en": "Kera",
+    "name_am": "ቄራ",
+    "coordinates": [
+      38.7502,
+      8.9848
+    ],
+    "woreda_id": 67,
+    "woreda_number": "04",
+    "subcity_id": 6,
+    "subcity_en": "Kirkos",
+    "subcity_am": "ቂርቆስ",
+    "full_name_en": "Kirkos Woreda 04",
+    "full_name_am": "ቂርቆስ ወረዳ 04",
+    "patterns": [
+      "ቄራ",
+      "kera"
+    ]
+  },
+  {
+    "name_en": "Kazanchis",
+    "name_am": "ካዛንቺስ",
+    "coordinates": [
+      38.7712,
+      9.0159
+    ],
+    "woreda_id": 70,
+    "woreda_number": "08",
+    "subcity_id": 6,
+    "subcity_en": "Kirkos",
+    "subcity_am": "ቂርቆስ",
+    "full_name_en": "Kirkos Woreda 08",
+    "full_name_am": "ቂርቆስ ወረዳ 08",
+    "patterns": [
+      "ካዛንቺስ",
+      "kazanchis"
+    ]
+  },
+  {
+    "name_en": "Gotera",
+    "name_am": "ጎተራ",
+    "coordinates": [
+      38.761,
+      8.988
+    ],
+    "woreda_id": 65,
+    "woreda_number": "03",
+    "subcity_id": 6,
+    "subcity_en": "Kirkos",
+    "subcity_am": "ቂርቆስ",
+    "full_name_en": "Kirkos Woreda 03",
+    "full_name_am": "ቂርቆስ ወረዳ 03",
+    "patterns": [
+      "ጎተራ",
+      "gotera"
+    ]
+  },
+  {
+    "name_en": "Beklo Bet",
+    "name_am": "በቅሎ ቤት",
+    "coordinates": [
+      38.758,
+      8.993
+    ],
+    "woreda_id": 67,
+    "woreda_number": "04",
+    "subcity_id": 6,
+    "subcity_en": "Kirkos",
+    "subcity_am": "ቂርቆስ",
+    "full_name_en": "Kirkos Woreda 04",
+    "full_name_am": "ቂርቆስ ወረዳ 04",
+    "patterns": [
+      "በቅሎ\\s*ቤት",
+      "beklo\\s*bet"
+    ]
+  },
+  {
+    "name_en": "Meskel Square",
+    "name_am": "መስቀል አደባባይ",
+    "coordinates": [
+      38.7635,
+      9.0108
+    ],
+    "woreda_id": 69,
+    "woreda_number": "01",
+    "subcity_id": 6,
+    "subcity_en": "Kirkos",
+    "subcity_am": "ቂርቆስ",
+    "full_name_en": "Kirkos Woreda 01",
+    "full_name_am": "ቂርቆስ ወረዳ 01",
+    "patterns": [
+      "መስቀል\\s*አደባባይ",
+      "meskel\\s*square"
+    ]
+  },
+  {
+    "name_en": "Olympia",
+    "name_am": "ኦሊምፒያ",
+    "coordinates": [
+      38.769,
+      9.001
+    ],
+    "woreda_id": 69,
+    "woreda_number": "01",
+    "subcity_id": 6,
+    "subcity_en": "Kirkos",
+    "subcity_am": "ቂርቆስ",
+    "full_name_en": "Kirkos Woreda 01",
+    "full_name_am": "ቂርቆስ ወረዳ 01",
+    "patterns": [
+      "ኦሊምፒያ",
+      "olympia"
+    ]
+  },
+  {
+    "name_en": "Wollo Sefer",
+    "name_am": "ወሎ ሰፈር",
+    "coordinates": [
+      38.775,
+      8.998
+    ],
+    "woreda_id": 86,
+    "woreda_number": "04",
+    "subcity_id": 4,
+    "subcity_en": "Bole",
+    "subcity_am": "ቦሌ",
+    "full_name_en": "Bole Woreda 04",
+    "full_name_am": "ቦሌ ወረዳ 04",
+    "patterns": [
+      "ወሎ\\s*ሰፈር",
+      "wollo\\s*sefer"
+    ]
+  },
+  {
+    "name_en": "Bambis",
+    "name_am": "ባምቢስ",
+    "coordinates": [
+      38.767,
+      9.013
+    ],
+    "woreda_id": 70,
+    "woreda_number": "08",
+    "subcity_id": 6,
+    "subcity_en": "Kirkos",
+    "subcity_am": "ቂርቆስ",
+    "full_name_en": "Kirkos Woreda 08",
+    "full_name_am": "ቂርቆስ ወረዳ 08",
+    "patterns": [
+      "ባምቢስ",
+      "bambis"
+    ]
+  },
+  {
+    "name_en": "Lancha",
+    "name_am": "ላንቻ",
+    "coordinates": [
+      38.754,
+      8.99
+    ],
+    "woreda_id": 67,
+    "woreda_number": "04",
+    "subcity_id": 6,
+    "subcity_en": "Kirkos",
+    "subcity_am": "ቂርቆስ",
+    "full_name_en": "Kirkos Woreda 04",
+    "full_name_am": "ቂርቆስ ወረዳ 04",
+    "patterns": [
+      "ላንቻ",
+      "lancha"
+    ]
+  },
+  {
+    "name_en": "Sar Bet",
+    "name_am": "ሳር ቤት",
+    "coordinates": [
+      38.74,
+      9.001
+    ],
+    "woreda_id": 61,
+    "woreda_number": "06",
+    "subcity_id": 6,
+    "subcity_en": "Kirkos",
+    "subcity_am": "ቂርቆስ",
+    "full_name_en": "Kirkos Woreda 06",
+    "full_name_am": "ቂርቆስ ወረዳ 06",
+    "patterns": [
+      "ሳር\\s*ቤት",
+      "sar\\s*bet"
+    ]
+  },
+  {
+    "name_en": "Bole Medhanialem",
+    "name_am": "ቦሌ መድኃኒዓለም",
+    "coordinates": [
+      38.7875,
+      8.9975
+    ],
+    "woreda_id": 85,
+    "woreda_number": "03",
+    "subcity_id": 4,
+    "subcity_en": "Bole",
+    "subcity_am": "ቦሌ",
+    "full_name_en": "Bole Woreda 03",
+    "full_name_am": "ቦሌ ወረዳ 03",
+    "patterns": [
+      "ቦሌ\\s*መድኃኒዓለም"
+    ]
+  },
+  {
+    "name_en": "Bole Atlas",
+    "name_am": "ቦሌ አትላስ",
+    "coordinates": [
+      38.783,
+      9.008
+    ],
+    "woreda_id": 86,
+    "woreda_number": "04",
+    "subcity_id": 4,
+    "subcity_en": "Bole",
+    "subcity_am": "ቦሌ",
+    "full_name_en": "Bole Woreda 04",
+    "full_name_am": "ቦሌ ወረዳ 04",
+    "patterns": [
+      "ቦሌ\\s*አትላስ",
+      "አትላስ"
+    ]
+  },
+  {
+    "name_en": "Bole Rwanda",
+    "name_am": "ቦሌ ሩዋንዳ",
+    "coordinates": [
+      38.776,
+      8.988
+    ],
+    "woreda_id": 83,
+    "woreda_number": "02",
+    "subcity_id": 4,
+    "subcity_en": "Bole",
+    "subcity_am": "ቦሌ",
+    "full_name_en": "Bole Woreda 02",
+    "full_name_am": "ቦሌ ወረዳ 02",
+    "patterns": [
+      "ቦሌ\\s*ሩዋንዳ",
+      "ሩዋንዳ"
+    ]
+  },
+  {
+    "name_en": "Bole Michael",
+    "name_am": "ቦሌ ሚካኤል",
+    "coordinates": [
+      38.769,
+      8.978
+    ],
+    "woreda_id": 82,
+    "woreda_number": "01",
+    "subcity_id": 4,
+    "subcity_en": "Bole",
+    "subcity_am": "ቦሌ",
+    "full_name_en": "Bole Woreda 01",
+    "full_name_am": "ቦሌ ወረዳ 01",
+    "patterns": [
+      "ቦሌ\\s*ሚካኤል"
+    ]
+  },
+  {
+    "name_en": "Bole Homes",
+    "name_am": "ቦሌ ሆምስ",
+    "coordinates": [
+      38.798,
+      9.012
+    ],
+    "woreda_id": 87,
+    "woreda_number": "05",
+    "subcity_id": 4,
+    "subcity_en": "Bole",
+    "subcity_am": "ቦሌ",
+    "full_name_en": "Bole Woreda 05",
+    "full_name_am": "ቦሌ ወረዳ 05",
+    "patterns": [
+      "ቦሌ\\s*ሆምስ",
+      "ብራስ"
+    ]
+  },
+  {
+    "name_en": "Gerji",
+    "name_am": "ገርጂ",
+    "coordinates": [
+      38.805,
+      8.995
+    ],
+    "woreda_id": 95,
+    "woreda_number": "13",
+    "subcity_id": 4,
+    "subcity_en": "Bole",
+    "subcity_am": "ቦሌ",
+    "full_name_en": "Bole Woreda 13",
+    "full_name_am": "ቦሌ ወረዳ 13",
+    "patterns": [
+      "ገርጂ",
+      "gerji"
+    ]
+  },
+  {
+    "name_en": "Gerji Mebrat Hail",
+    "name_am": "ገርጂ መብራት ኃይል",
+    "coordinates": [
+      38.812,
+      8.991
+    ],
+    "woreda_id": 95,
+    "woreda_number": "13",
+    "subcity_id": 4,
+    "subcity_en": "Bole",
+    "subcity_am": "ቦሌ",
+    "full_name_en": "Bole Woreda 13",
+    "full_name_am": "ቦሌ ወረዳ 13",
+    "patterns": [
+      "ገርጂ\\s*መብራት\\s*ኃይል"
+    ]
+  },
+  {
+    "name_en": "Summit",
+    "name_am": "ሰሚት",
+    "coordinates": [
+      38.852,
+      9.018
+    ],
+    "woreda_id": 92,
+    "woreda_number": "10",
+    "subcity_id": 4,
+    "subcity_en": "Bole",
+    "subcity_am": "ቦሌ",
+    "full_name_en": "Bole Woreda 10",
+    "full_name_am": "ቦሌ ወረዳ 10",
+    "patterns": [
+      "ሰሚት",
+      "summit"
+    ]
+  },
+  {
+    "name_en": "Goro",
+    "name_am": "ጎሮ",
+    "coordinates": [
+      38.835,
+      9.006
+    ],
+    "woreda_id": 91,
+    "woreda_number": "09",
+    "subcity_id": 4,
+    "subcity_en": "Bole",
+    "subcity_am": "ቦሌ",
+    "full_name_en": "Bole Woreda 09",
+    "full_name_am": "ቦሌ ወረዳ 09",
+    "patterns": [
+      "ጎሮ",
+      "goro"
+    ]
+  },
+  {
+    "name_en": "Bole Bulbula",
+    "name_am": "ቦሌ ቡልቡላ",
+    "coordinates": [
+      38.782,
+      8.965
+    ],
+    "woreda_id": 82,
+    "woreda_number": "01",
+    "subcity_id": 4,
+    "subcity_en": "Bole",
+    "subcity_am": "ቦሌ",
+    "full_name_en": "Bole Woreda 01",
+    "full_name_am": "ቦሌ ወረዳ 01",
+    "patterns": [
+      "ቦሌ\\s*ቡልቡላ"
+    ]
+  },
+  {
+    "name_en": "Bole Arabsa",
+    "name_am": "ቦሌ አረብሳ",
+    "coordinates": [
+      38.875,
+      9.005
+    ],
+    "woreda_id": 92,
+    "woreda_number": "10",
+    "subcity_id": 4,
+    "subcity_en": "Bole",
+    "subcity_am": "ቦሌ",
+    "full_name_en": "Bole Woreda 10",
+    "full_name_am": "ቦሌ ወረዳ 10",
+    "patterns": [
+      "ቦሌ\\s*አረብሳ",
+      "አረብሳ"
+    ]
+  },
+  {
+    "name_en": "Jackros",
+    "name_am": "ጃክሮስ",
+    "coordinates": [
+      38.825,
+      9.008
+    ],
+    "woreda_id": 89,
+    "woreda_number": "07",
+    "subcity_id": 4,
+    "subcity_en": "Bole",
+    "subcity_am": "ቦሌ",
+    "full_name_en": "Bole Woreda 07",
+    "full_name_am": "ቦሌ ወረዳ 07",
+    "patterns": [
+      "ጃክሮስ",
+      "jackros"
+    ]
+  },
+  {
+    "name_en": "Ayat",
+    "name_am": "አያት",
+    "coordinates": [
+      38.868,
+      9.035
+    ],
+    "woreda_id": 21,
+    "woreda_number": "13",
+    "subcity_id": 10,
+    "subcity_en": "Yeka",
+    "subcity_am": "የካ",
+    "full_name_en": "Yeka Woreda 13",
+    "full_name_am": "የካ ወረዳ 13",
+    "patterns": [
+      "አያት",
+      "ayat"
+    ]
+  },
+  {
+    "name_en": "CMC",
+    "name_am": "ሲኤምሲ",
+    "coordinates": [
+      38.831,
+      9.021
+    ],
+    "woreda_id": 23,
+    "woreda_number": "11",
+    "subcity_id": 10,
+    "subcity_en": "Yeka",
+    "subcity_am": "የካ",
+    "full_name_en": "Yeka Woreda 11",
+    "full_name_am": "የካ ወረዳ 11",
+    "patterns": [
+      "ሲኤምሲ",
+      "\\bcmc\\b"
+    ]
+  },
+  {
+    "name_en": "Megenagna",
+    "name_am": "መገናኛ",
+    "coordinates": [
+      38.799,
+      9.02
+    ],
+    "woreda_id": 19,
+    "woreda_number": "08",
+    "subcity_id": 10,
+    "subcity_en": "Yeka",
+    "subcity_am": "የካ",
+    "full_name_en": "Yeka Woreda 08",
+    "full_name_am": "የካ ወረዳ 08",
+    "patterns": [
+      "መገናኛ",
+      "megenagna"
+    ]
+  },
+  {
+    "name_en": "22 Mazoriya",
+    "name_am": "ሃያ ሁለት ማዞሪያ",
+    "coordinates": [
+      38.784,
+      9.021
+    ],
+    "woreda_id": 15,
+    "woreda_number": "07",
+    "subcity_id": 10,
+    "subcity_en": "Yeka",
+    "subcity_am": "የካ",
+    "full_name_en": "Yeka Woreda 07",
+    "full_name_am": "የካ ወረዳ 07",
+    "patterns": [
+      "ሃያ\\s*ሁለት",
+      "22\\s*ማዞሪያ",
+      "22\\s*mazoriya"
+    ]
+  },
+  {
+    "name_en": "Kotebe",
+    "name_am": "ኮተቤ",
+    "coordinates": [
+      38.825,
+      9.038
+    ],
+    "woreda_id": 20,
+    "woreda_number": "10",
+    "subcity_id": 10,
+    "subcity_en": "Yeka",
+    "subcity_am": "የካ",
+    "full_name_en": "Yeka Woreda 10",
+    "full_name_am": "የካ ወረዳ 10",
+    "patterns": [
+      "ኮተቤ",
+      "kotebe"
+    ]
+  },
+  {
+    "name_en": "Kara",
+    "name_am": "ቃራ",
+    "coordinates": [
+      38.852,
+      9.052
+    ],
+    "woreda_id": 22,
+    "woreda_number": "12",
+    "subcity_id": 10,
+    "subcity_en": "Yeka",
+    "subcity_am": "የካ",
+    "full_name_en": "Yeka Woreda 12",
+    "full_name_am": "የካ ወረዳ 12",
+    "patterns": [
+      "ቃራ",
+      "ካራ\\s*አሎ"
+    ]
+  },
+  {
+    "name_en": "Ferensay Legasion",
+    "name_am": "ፈረንሳይ ሌጋሲዮን",
+    "coordinates": [
+      38.778,
+      9.059
+    ],
+    "woreda_id": 12,
+    "woreda_number": "01",
+    "subcity_id": 10,
+    "subcity_en": "Yeka",
+    "subcity_am": "የካ",
+    "full_name_en": "Yeka Woreda 01",
+    "full_name_am": "የካ ወረዳ 01",
+    "patterns": [
+      "ፈረንሳይ\\s*ሌጋሲዮን",
+      "ፈረንሳይ"
+    ]
+  },
+  {
+    "name_en": "Shola Gebeya",
+    "name_am": "ሾላ ገበያ",
+    "coordinates": [
+      38.789,
+      9.023
+    ],
+    "woreda_id": 19,
+    "woreda_number": "08",
+    "subcity_id": 10,
+    "subcity_en": "Yeka",
+    "subcity_am": "የካ",
+    "full_name_en": "Yeka Woreda 08",
+    "full_name_am": "የካ ወረዳ 08",
+    "patterns": [
+      "ሾላ\\s*ገበያ",
+      "ሾላ"
+    ]
+  },
+  {
+    "name_en": "Yeka Abado Condominium",
+    "name_am": "የካ አባዶ ኮንዶሚንየም",
+    "coordinates": [
+      38.892,
+      9.031
+    ],
+    "woreda_id": 21,
+    "woreda_number": "13",
+    "subcity_id": 10,
+    "subcity_en": "Yeka",
+    "subcity_am": "የካ",
+    "full_name_en": "Yeka Woreda 13",
+    "full_name_am": "የካ ወረዳ 13",
+    "patterns": [
+      "የካ\\s*አባዶ",
+      "አባዶ"
+    ]
+  },
+  {
+    "name_en": "Koye Feche 05",
+    "name_am": "ኮዬ ፈጬ 05",
+    "coordinates": [
+      38.8248,
+      8.9032
+    ],
+    "woreda_id": 108,
+    "woreda_number": "09",
+    "subcity_id": 2,
+    "subcity_en": "Akaki Kality",
+    "subcity_am": "አቃቂ ቃሊቲ",
+    "full_name_en": "Akaki Kality Woreda 09",
+    "full_name_am": "አቃቂ ቃሊቲ ወረዳ 09",
+    "patterns": [
+      "ኮዬ\\s*05",
+      "ኮዬ\\s*ፈጬ",
+      "ኮዬ"
+    ]
+  },
+  {
+    "name_en": "Koye Feche Project 12",
+    "name_am": "ኮዬ ፕሮጀክት 12",
+    "coordinates": [
+      38.828,
+      8.901
+    ],
+    "woreda_id": 108,
+    "woreda_number": "09",
+    "subcity_id": 2,
+    "subcity_en": "Akaki Kality",
+    "subcity_am": "አቃቂ ቃሊቲ",
+    "full_name_en": "Akaki Kality Woreda 09",
+    "full_name_am": "አቃቂ ቃሊቲ ወረዳ 09",
+    "patterns": [
+      "ፕሮጀክት\\s*12"
+    ]
+  },
+  {
+    "name_en": "Koye Feche Project 16",
+    "name_am": "ኮዬ ፕሮጀክት 16",
+    "coordinates": [
+      38.822,
+      8.904
+    ],
+    "woreda_id": 108,
+    "woreda_number": "09",
+    "subcity_id": 2,
+    "subcity_en": "Akaki Kality",
+    "subcity_am": "አቃቂ ቃሊቲ",
+    "full_name_en": "Akaki Kality Woreda 09",
+    "full_name_am": "አቃቂ ቃሊቲ ወረዳ 09",
+    "patterns": [
+      "ፕሮጀክት\\s*16"
+    ]
+  },
+  {
+    "name_en": "Koye Feche Project 17",
+    "name_am": "ኮዬ ፕሮጀክት 17",
+    "coordinates": [
+      38.826,
+      8.902
+    ],
+    "woreda_id": 108,
+    "woreda_number": "09",
+    "subcity_id": 2,
+    "subcity_en": "Akaki Kality",
+    "subcity_am": "አቃቂ ቃሊቲ",
+    "full_name_en": "Akaki Kality Woreda 09",
+    "full_name_am": "አቃቂ ቃሊቲ ወረዳ 09",
+    "patterns": [
+      "ፕሮጀክት\\s*17"
+    ]
+  },
+  {
+    "name_en": "Saris",
+    "name_am": "ሳሪስ",
+    "coordinates": [
+      38.765,
+      8.955
+    ],
+    "woreda_id": 110,
+    "woreda_number": "06",
+    "subcity_id": 2,
+    "subcity_en": "Akaki Kality",
+    "subcity_am": "አቃቂ ቃሊቲ",
+    "full_name_en": "Akaki Kality Woreda 06",
+    "full_name_am": "አቃቂ ቃሊቲ ወረዳ 06",
+    "patterns": [
+      "ሳሪስ",
+      "saris"
+    ]
+  },
+  {
+    "name_en": "Kality",
+    "name_am": "ቃሊቲ",
+    "coordinates": [
+      38.752,
+      8.905
+    ],
+    "woreda_id": 115,
+    "woreda_number": "07",
+    "subcity_id": 2,
+    "subcity_en": "Akaki Kality",
+    "subcity_am": "አቃቂ ቃሊቲ",
+    "full_name_en": "Akaki Kality Woreda 07",
+    "full_name_am": "አቃቂ ቃሊቲ ወረዳ 07",
+    "patterns": [
+      "ቃሊቲ",
+      "kality"
+    ]
+  },
+  {
+    "name_en": "Tulu Dimtu",
+    "name_am": "ቱሉ ዲምቱ",
+    "coordinates": [
+      38.805,
+      8.878
+    ],
+    "woreda_id": 108,
+    "woreda_number": "09",
+    "subcity_id": 2,
+    "subcity_en": "Akaki Kality",
+    "subcity_am": "አቃቂ ቃሊቲ",
+    "full_name_en": "Akaki Kality Woreda 09",
+    "full_name_am": "አቃቂ ቃሊቲ ወረዳ 09",
+    "patterns": [
+      "ቱሉ\\s*ዲምቱ"
+    ]
+  },
+  {
+    "name_en": "Gelan Condominium",
+    "name_am": "ገላን ኮንዶሚንየም",
+    "coordinates": [
+      38.828,
+      8.889
+    ],
+    "woreda_id": 108,
+    "woreda_number": "09",
+    "subcity_id": 2,
+    "subcity_en": "Akaki Kality",
+    "subcity_am": "አቃቂ ቃሊቲ",
+    "full_name_en": "Akaki Kality Woreda 09",
+    "full_name_am": "አቃቂ ቃሊቲ ወረዳ 09",
+    "patterns": [
+      "ገላን"
+    ]
+  },
+  {
+    "name_en": "Crown Hotel",
+    "name_am": "ክራውን ሆቴል",
+    "coordinates": [
+      38.761,
+      8.932
+    ],
+    "woreda_id": 111,
+    "woreda_number": "05",
+    "subcity_id": 2,
+    "subcity_en": "Akaki Kality",
+    "subcity_am": "አቃቂ ቃሊቲ",
+    "full_name_en": "Akaki Kality Woreda 05",
+    "full_name_am": "አቃቂ ቃሊቲ ወረዳ 05",
+    "patterns": [
+      "ክራውን\\s*ሆቴል",
+      "ክራውን"
+    ]
+  },
+  {
+    "name_en": "Merkato",
+    "name_am": "መርካቶ",
+    "coordinates": [
+      38.738,
+      9.03
+    ],
+    "woreda_id": 7,
+    "woreda_number": "08",
+    "subcity_id": 1,
+    "subcity_en": "Addis Ketema",
+    "subcity_am": "አዲስ ከተማ",
+    "full_name_en": "Addis Ketema Woreda 08",
+    "full_name_am": "አዲስ ከተማ ወረዳ 08",
+    "patterns": [
+      "መርካቶ",
+      "merkato"
+    ]
+  },
+  {
+    "name_en": "Autobus Tera",
+    "name_am": "አውቶቡስ ተራ",
+    "coordinates": [
+      38.732,
+      9.033
+    ],
+    "woreda_id": 7,
+    "woreda_number": "08",
+    "subcity_id": 1,
+    "subcity_en": "Addis Ketema",
+    "subcity_am": "አዲስ ከተማ",
+    "full_name_en": "Addis Ketema Woreda 08",
+    "full_name_am": "አዲስ ከተማ ወረዳ 08",
+    "patterns": [
+      "አውቶቡስ\\s*ተራ"
+    ]
+  },
+  {
+    "name_en": "Sebategna",
+    "name_am": "ሰባተኛ",
+    "coordinates": [
+      38.737,
+      9.027
+    ],
+    "woreda_id": 5,
+    "woreda_number": "01",
+    "subcity_id": 1,
+    "subcity_en": "Addis Ketema",
+    "subcity_am": "አዲስ ከተማ",
+    "full_name_en": "Addis Ketema Woreda 01",
+    "full_name_am": "አዲስ ከተማ ወረዳ 01",
+    "patterns": [
+      "ሰባተኛ"
+    ]
+  },
+  {
+    "name_en": "Abinet",
+    "name_am": "አቢኔት",
+    "coordinates": [
+      38.742,
+      9.022
+    ],
+    "woreda_id": 40,
+    "woreda_number": "05",
+    "subcity_id": 8,
+    "subcity_en": "Lideta",
+    "subcity_am": "ልደታ",
+    "full_name_en": "Lideta Woreda 05",
+    "full_name_am": "ልደታ ወረዳ 05",
+    "patterns": [
+      "አቢኔት"
+    ]
+  },
+  {
+    "name_en": "Piazza",
+    "name_am": "ፒያሳ",
+    "coordinates": [
+      38.7515,
+      9.0345
+    ],
+    "woreda_id": 101,
+    "woreda_number": "01",
+    "subcity_id": 3,
+    "subcity_en": "Arada",
+    "subcity_am": "አራዳ",
+    "full_name_en": "Arada Woreda 01",
+    "full_name_am": "አራዳ ወረዳ 01",
+    "patterns": [
+      "ፒያሳ",
+      "piazza"
+    ]
+  },
+  {
+    "name_en": "4 Kilo",
+    "name_am": "አራት ኪሎ",
+    "coordinates": [
+      38.763,
+      9.034
+    ],
+    "woreda_id": 105,
+    "woreda_number": "09",
+    "subcity_id": 3,
+    "subcity_en": "Arada",
+    "subcity_am": "አራዳ",
+    "full_name_en": "Arada Woreda 09",
+    "full_name_am": "አራዳ ወረዳ 09",
+    "patterns": [
+      "አራት\\s*ኪሎ",
+      "4\\s*kilo"
+    ]
+  },
+  {
+    "name_en": "6 Kilo",
+    "name_am": "ስድስት ኪሎ",
+    "coordinates": [
+      38.762,
+      9.047
+    ],
+    "woreda_id": 79,
+    "woreda_number": "02",
+    "subcity_id": 5,
+    "subcity_en": "Gulele",
+    "subcity_am": "ጉለሌ",
+    "full_name_en": "Gulele Woreda 02",
+    "full_name_am": "ጉለሌ ወረዳ 02",
+    "patterns": [
+      "ስድስት\\s*ኪሎ",
+      "6\\s*kilo"
+    ]
+  },
+  {
+    "name_en": "Eri Bekentu",
+    "name_am": "እሪ በከንቱ",
+    "coordinates": [
+      38.748,
+      9.038
+    ],
+    "woreda_id": 100,
+    "woreda_number": "05",
+    "subcity_id": 3,
+    "subcity_en": "Arada",
+    "subcity_am": "አራዳ",
+    "full_name_en": "Arada Woreda 05",
+    "full_name_am": "አራዳ ወረዳ 05",
+    "patterns": [
+      "እሪ\\s*በከንቱ"
+    ]
+  },
+  {
+    "name_en": "Shekla Sefer",
+    "name_am": "ሸክላ ሰፈር",
+    "coordinates": [
+      38.7441,
+      9.0553
+    ],
+    "woreda_id": 74,
+    "woreda_number": "07",
+    "subcity_id": 5,
+    "subcity_en": "Gulele",
+    "subcity_am": "ጉለሌ",
+    "full_name_en": "Gulele Woreda 07",
+    "full_name_am": "ጉለሌ ወረዳ 07",
+    "patterns": [
+      "ሸክላ\\s*ሰፈር"
+    ]
+  },
+  {
+    "name_en": "Shiro Meda",
+    "name_am": "ሽሮ ሜዳ",
+    "coordinates": [
+      38.761,
+      9.062
+    ],
+    "woreda_id": 79,
+    "woreda_number": "02",
+    "subcity_id": 5,
+    "subcity_en": "Gulele",
+    "subcity_am": "ጉለሌ",
+    "full_name_en": "Gulele Woreda 02",
+    "full_name_am": "ጉለሌ ወረዳ 02",
+    "patterns": [
+      "ሽሮ\\s*ሜዳ"
+    ]
+  },
+  {
+    "name_en": "Addisu Gebeya",
+    "name_am": "አዲሱ ገበያ",
+    "coordinates": [
+      38.736,
+      9.059
+    ],
+    "woreda_id": 73,
+    "woreda_number": "08",
+    "subcity_id": 5,
+    "subcity_en": "Gulele",
+    "subcity_am": "ጉለሌ",
+    "full_name_en": "Gulele Woreda 08",
+    "full_name_am": "ጉለሌ ወረዳ 08",
+    "patterns": [
+      "አዲሱ\\s*ገበያ"
+    ]
+  },
+  {
+    "name_en": "Semien Mazegaja",
+    "name_am": "ሰሜን ማዘጋጃ",
+    "coordinates": [
+      38.748,
+      9.049
+    ],
+    "woreda_id": 99,
+    "woreda_number": "04",
+    "subcity_id": 3,
+    "subcity_en": "Arada",
+    "subcity_am": "አራዳ",
+    "full_name_en": "Arada Woreda 04",
+    "full_name_am": "አራዳ ወረዳ 04",
+    "patterns": [
+      "ሰሜን\\s*ማዘጋጃ"
+    ]
+  },
+  {
+    "name_en": "Wingate",
+    "name_am": "ዊንጌት",
+    "coordinates": [
+      38.718,
+      9.06
+    ],
+    "woreda_id": 81,
+    "woreda_number": "10",
+    "subcity_id": 5,
+    "subcity_en": "Gulele",
+    "subcity_am": "ጉለሌ",
+    "full_name_en": "Gulele Woreda 10",
+    "full_name_am": "ጉለሌ ወረዳ 10",
+    "patterns": [
+      "ዊንጌት",
+      "wingate"
+    ]
+  },
+  {
+    "name_en": "Rufael",
+    "name_am": "ሩፋኤል",
+    "coordinates": [
+      38.728,
+      9.048
+    ],
+    "woreda_id": 72,
+    "woreda_number": "09",
+    "subcity_id": 5,
+    "subcity_en": "Gulele",
+    "subcity_am": "ጉለሌ",
+    "full_name_en": "Gulele Woreda 09",
+    "full_name_am": "ጉለሌ ወረዳ 09",
+    "patterns": [
+      "ሩፋኤል"
+    ]
+  },
+  {
+    "name_en": "Entoto",
+    "name_am": "እንጦጦ",
+    "coordinates": [
+      38.755,
+      9.085
+    ],
+    "woreda_id": 75,
+    "woreda_number": "06",
+    "subcity_id": 5,
+    "subcity_en": "Gulele",
+    "subcity_am": "ጉለሌ",
+    "full_name_en": "Gulele Woreda 06",
+    "full_name_am": "ጉለሌ ወረዳ 06",
+    "patterns": [
+      "እንጦጦ"
+    ]
+  },
+  {
+    "name_en": "Burayu Mazegaja / Beg Tera",
+    "name_am": "ቡራዩ ማዘጋጃ / በግ ተራ",
+    "coordinates": [
+      38.694,
+      9.062
+    ],
+    "woreda_id": 59,
+    "woreda_number": "14",
+    "subcity_id": 7,
+    "subcity_en": "Kolfe Keranyo",
+    "subcity_am": "ኮልፌ ቀራኒዮ",
+    "full_name_en": "Kolfe Keranyo Woreda 14",
+    "full_name_am": "ኮልፌ ቀራኒዮ ወረዳ 14",
+    "patterns": [
+      "ቡራዩ\\s*ማዘጋጃ",
+      "ቡራዩ\\s*ካርቶን",
+      "ቡራዩ\\s*በግ\\s*ተራ",
+      "ቡራዩ",
+      "ጽርሐ\\s*ጽዮን"
+    ]
+  },
+  {
+    "name_en": "Kolfe Total",
+    "name_am": "ኮልፌ ቶታል",
+    "coordinates": [
+      38.712,
+      9.028
+    ],
+    "woreda_id": 55,
+    "woreda_number": "10",
+    "subcity_id": 7,
+    "subcity_en": "Kolfe Keranyo",
+    "subcity_am": "ኮልፌ ቀራኒዮ",
+    "full_name_en": "Kolfe Keranyo Woreda 10",
+    "full_name_am": "ኮልፌ ቀራኒዮ ወረዳ 10",
+    "patterns": [
+      "ኮልፌ\\s*ቶታል",
+      "18\\s*ማዞሪያ"
+    ]
+  },
+  {
+    "name_en": "Zenebe Werk",
+    "name_am": "ዘነበ ወርቅ",
+    "coordinates": [
+      38.705,
+      9.012
+    ],
+    "woreda_id": 51,
+    "woreda_number": "08",
+    "subcity_id": 7,
+    "subcity_en": "Kolfe Keranyo",
+    "subcity_am": "ኮልፌ ቀራኒዮ",
+    "full_name_en": "Kolfe Keranyo Woreda 08",
+    "full_name_am": "ኮልፌ ቀራኒዮ ወረዳ 08",
+    "patterns": [
+      "ዘነበ\\s*ወርቅ"
+    ]
+  },
+  {
+    "name_en": "Ayer Tena",
+    "name_am": "አየር ጤና",
+    "coordinates": [
+      38.695,
+      8.995
+    ],
+    "woreda_id": 50,
+    "woreda_number": "05",
+    "subcity_id": 7,
+    "subcity_en": "Kolfe Keranyo",
+    "subcity_am": "ኮልፌ ቀራኒዮ",
+    "full_name_en": "Kolfe Keranyo Woreda 05",
+    "full_name_am": "ኮልፌ ቀራኒዮ ወረዳ 05",
+    "patterns": [
+      "አየር\\s*ጤና"
+    ]
+  },
+  {
+    "name_en": "Tor Hailoch",
+    "name_am": "ጦር ኃይሎች",
+    "coordinates": [
+      38.721,
+      9.01
+    ],
+    "woreda_id": 36,
+    "woreda_number": "01",
+    "subcity_id": 8,
+    "subcity_en": "Lideta",
+    "subcity_am": "ልደታ",
+    "full_name_en": "Lideta Woreda 01",
+    "full_name_am": "ልደታ ወረዳ 01",
+    "patterns": [
+      "ጦር\\s*ኃይሎች",
+      "tor\\s*hailoch"
+    ]
+  },
+  {
+    "name_en": "Alem Bank",
+    "name_am": "ዓለም ባንክ",
+    "coordinates": [
+      38.685,
+      9.015
+    ],
+    "woreda_id": 51,
+    "woreda_number": "08",
+    "subcity_id": 7,
+    "subcity_en": "Kolfe Keranyo",
+    "subcity_am": "ኮልፌ ቀራኒዮ",
+    "full_name_en": "Kolfe Keranyo Woreda 08",
+    "full_name_am": "ኮልፌ ቀራኒዮ ወረዳ 08",
+    "patterns": [
+      "ዓለም\\s*ባንክ",
+      "alem\\s*bank"
+    ]
+  },
+  {
+    "name_en": "Bethel",
+    "name_am": "ቤቴል",
+    "coordinates": [
+      38.692,
+      9.005
+    ],
+    "woreda_id": 52,
+    "woreda_number": "07",
+    "subcity_id": 7,
+    "subcity_en": "Kolfe Keranyo",
+    "subcity_am": "ኮልፌ ቀራኒዮ",
+    "full_name_en": "Kolfe Keranyo Woreda 07",
+    "full_name_am": "ኮልፌ ቀራኒዮ ወረዳ 07",
+    "patterns": [
+      "ቤቴል",
+      "bethel"
+    ]
+  },
+  {
+    "name_en": "Asko",
+    "name_am": "አስኮ",
+    "coordinates": [
+      38.705,
+      9.065
+    ],
+    "woreda_id": 60,
+    "woreda_number": "15",
+    "subcity_id": 7,
+    "subcity_en": "Kolfe Keranyo",
+    "subcity_am": "ኮልፌ ቀራኒዮ",
+    "full_name_en": "Kolfe Keranyo Woreda 15",
+    "full_name_am": "ኮልፌ ቀራኒዮ ወረዳ 15",
+    "patterns": [
+      "አስኮ",
+      "asko"
+    ]
+  },
+  {
+    "name_en": "Mexico",
+    "name_am": "ሜክሲኮ",
+    "coordinates": [
+      38.745,
+      9.0105
+    ],
+    "woreda_id": 44,
+    "woreda_number": "09",
+    "subcity_id": 8,
+    "subcity_en": "Lideta",
+    "subcity_am": "ልደታ",
+    "full_name_en": "Lideta Woreda 09",
+    "full_name_am": "ልደታ ወረዳ 09",
+    "patterns": [
+      "ሜክሲኮ",
+      "mexico"
+    ]
+  },
+  {
+    "name_en": "Lideta Balcha",
+    "name_am": "ልደታ ባልቻ",
+    "coordinates": [
+      38.741,
+      9.015
+    ],
+    "woreda_id": 45,
+    "woreda_number": "08",
+    "subcity_id": 8,
+    "subcity_en": "Lideta",
+    "subcity_am": "ልደታ",
+    "full_name_en": "Lideta Woreda 08",
+    "full_name_am": "ልደታ ወረዳ 08",
+    "patterns": [
+      "ባልቻ",
+      "ልደታ\\s*ኮንዶሚንየም"
+    ]
+  },
+  {
+    "name_en": "Teklehaimanot",
+    "name_am": "ተክለሃይማኖት",
+    "coordinates": [
+      38.745,
+      9.023
+    ],
+    "woreda_id": 38,
+    "woreda_number": "06",
+    "subcity_id": 8,
+    "subcity_en": "Lideta",
+    "subcity_am": "ልደታ",
+    "full_name_en": "Lideta Woreda 06",
+    "full_name_am": "ልደታ ወረዳ 06",
+    "patterns": [
+      "ተክለሃይማኖት"
+    ]
+  },
+  {
+    "name_en": "Geja Sefer",
+    "name_am": "ገጃ ሰፈር",
+    "coordinates": [
+      38.74,
+      9.008
+    ],
+    "woreda_id": 37,
+    "woreda_number": "10",
+    "subcity_id": 8,
+    "subcity_en": "Lideta",
+    "subcity_am": "ልደታ",
+    "full_name_en": "Lideta Woreda 10",
+    "full_name_am": "ልደታ ወረዳ 10",
+    "patterns": [
+      "ገጃ\\s*ሰፈር"
+    ]
+  },
+  {
+    "name_en": "Senga Tera",
+    "name_am": "ሰንጋ ተራ",
+    "coordinates": [
+      38.748,
+      9.016
+    ],
+    "woreda_id": 44,
+    "woreda_number": "09",
+    "subcity_id": 8,
+    "subcity_en": "Lideta",
+    "subcity_am": "ልደታ",
+    "full_name_en": "Lideta Woreda 09",
+    "full_name_am": "ልደታ ወረዳ 09",
+    "patterns": [
+      "ሰንጋ\\s*ተራ"
+    ]
+  }
+]

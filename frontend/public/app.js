@@ -69,6 +69,10 @@ const I18N = {
     copied_btn: 'Copied! Press Ctrl+F in Telegram',
     show_embed: 'Show Embed ▾',
     hide_embed: 'Hide Embed ▴',
+    pinpoint_title: 'Specific Affected Landmark / Neighborhood',
+    view_details_btn: 'View Full Announcement',
+    zoom_landmark_btn: 'Zoom to Landmark',
+    specific_landmarks_title: 'Specific Affected Landmarks & Neighborhoods',
   },
   am: {
     brand_title: 'የኢትዮጵያ የኃይል መከታተያ',
@@ -133,6 +137,10 @@ const I18N = {
     copied_btn: 'ተቀድቷል! በቴሌግራም Ctrl+F ተጭነው ይፈልጉ',
     show_embed: 'ማስታወቂያውን አሳይ ▾',
     hide_embed: 'ማስታወቂያውን ደብቅ ▴',
+    pinpoint_title: 'የተለየ የተጎዳ ሰፈር / ኮንዶሚኒየም',
+    view_details_btn: 'ሙሉውን ማስታወቂያ ይመልከቱ',
+    zoom_landmark_btn: 'ወደ ሰፈሩ አቅርብ',
+    specific_landmarks_title: 'የተለዩ የተጎዱ ሰፈሮች እና ኮንዶሚኒየሞች',
   },
 };
 
@@ -140,6 +148,8 @@ const I18N = {
 let currentLang = 'en';
 let mapInstance = null;
 let geoJsonLayer = null;
+let landmarkPinsLayer = null;
+let mapLandmarkPins = [];
 let woredaFeatures = [];
 let woredaStatusMap = new Map();
 let currentView = 'map'; // 'map', 'outages', 'calendar', 'areas', 'admin'
@@ -315,6 +325,8 @@ function initMap() {
     subdomains: 'abcd',
     maxZoom: 19,
   }).addTo(mapInstance);
+
+  landmarkPinsLayer = L.layerGroup().addTo(mapInstance);
 }
 
 // Load GeoJSON and live API status
@@ -334,6 +346,8 @@ async function loadData() {
         woredaStatusMap.set(s.woreda_id, s);
       });
     }
+
+    mapLandmarkPins = Array.isArray(statusData.landmark_pins) ? statusData.landmark_pins : [];
 
     // 3. Fetch active and upcoming outages (past days & hours stripped out)
     const outRes = await fetch('/api/v1/outages?scope=upcoming');
@@ -358,6 +372,9 @@ async function loadData() {
 
     // 5. Render GeoJSON on Map
     renderGeoJsonLayer();
+
+    // 6. Render Sub-Woreda Landmark Pins
+    renderLandmarkPins();
   } catch (err) {
     console.error('Failed to load map data:', err);
   }
@@ -406,7 +423,7 @@ function getFeatureStyle(feature) {
         weight: 1.5,
         opacity: 0.9,
         color: '#d97706',
-        fillOpacity: 0.65,
+        fillOpacity: 0.35, // More translucent so landmark pins pop out clearly
       };
     case 'LIKELY':
     case 'REPORTED':
@@ -479,6 +496,7 @@ function renderGeoJsonLayer() {
 
 function updateMapLabels() {
   if (geoJsonLayer) renderGeoJsonLayer();
+  renderLandmarkPins();
 }
 
 function getStatusLabel(status) {
@@ -646,6 +664,31 @@ function openWoredaDetailModal(properties, statusInfo) {
   } else {
     dateBox.classList.add('hidden');
     timeBox.classList.add('hidden');
+  }
+
+  // Specific Affected Landmarks & Condos in Woreda
+  const landmarksBox = document.getElementById('modalLandmarksBox');
+  const landmarksList = document.getElementById('modalLandmarksList');
+  if (landmarksBox && landmarksList) {
+    const landmarks = Array.isArray(statusInfo?.landmarks) ? statusInfo.landmarks : [];
+    if (landmarks.length > 0) {
+      landmarksList.innerHTML = landmarks
+        .map((lm) => {
+          const displayName = currentLang === 'am' ? (lm.name_am || lm.name_en) : (lm.name_en || lm.name_am);
+          return `
+            <button type="button" onclick="zoomToLandmark(${lm.lat}, ${lm.lng}, '${escapeHtml(displayName)}')"
+              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-medium transition cursor-pointer shadow-sm">
+              <span>📍</span>
+              <span>${escapeHtml(displayName)}</span>
+              <span class="text-[10px] text-amber-400/80 bg-amber-500/20 px-1 rounded">🎯 ${t('zoom_landmark_btn')}</span>
+            </button>
+          `;
+        })
+        .join('');
+      landmarksBox.classList.remove('hidden');
+    } else {
+      landmarksBox.classList.add('hidden');
+    }
   }
 
   // Reason
@@ -1025,6 +1068,136 @@ ${escapedFullText}
   `;
 }
 
+// Sub-Woreda Landmark Pinpoint Layer Rendering
+function renderLandmarkPins() {
+  if (!mapInstance || !landmarkPinsLayer) return;
+  landmarkPinsLayer.clearLayers();
+
+  if (!Array.isArray(mapLandmarkPins) || mapLandmarkPins.length === 0) return;
+
+  mapLandmarkPins.forEach((pin) => {
+    if (!pin.lat || !pin.lng) return;
+
+    const name = currentLang === 'am' ? (pin.name_am || pin.name_en) : (pin.name_en || pin.name_am);
+    const subcityName = pin.subcity_en || 'Addis Ababa';
+    const woredaNum = pin.woreda_number || '';
+
+    // Custom pulsing pin divIcon
+    const pinIcon = L.divIcon({
+      className: 'landmark-pin-icon',
+      html: `<div class="landmark-pulse-container" title="${escapeHtml(name)}">
+        <div class="landmark-pulse-ring"></div>
+        <div class="landmark-pulse-dot"></div>
+      </div>`,
+      iconSize: [24, 24],
+      iconAnchor: [12, 12],
+      popupAnchor: [0, -10],
+    });
+
+    // Outer 350m radius zone circle indicating localized affected perimeter
+    const radiusCircle = L.circle([pin.lat, pin.lng], {
+      radius: 350,
+      color: '#f59e0b',
+      weight: 1.5,
+      dashArray: '4, 4',
+      fillColor: '#f59e0b',
+      fillOpacity: 0.12,
+      interactive: false,
+    });
+    landmarkPinsLayer.addLayer(radiusCircle);
+
+    // Marker
+    const marker = L.marker([pin.lat, pin.lng], { icon: pinIcon });
+
+    // Tooltip on hover
+    marker.bindTooltip(
+      `<div class="font-bold text-xs text-amber-400">📍 ${escapeHtml(name)}</div>
+       <div class="text-[11px] text-slate-300">${escapeHtml(subcityName)} • Woreda ${escapeHtml(woredaNum)}</div>`,
+      { direction: 'top', offset: [0, -10], className: 'leaflet-dark-tooltip' }
+    );
+
+    // Popup content with direct Telegram excerpt & link
+    const sEth = pin.scheduled_start ? formatEthiopianTime(pin.scheduled_start) : null;
+    const eEth = pin.scheduled_end ? formatEthiopianTime(pin.scheduled_end) : null;
+    const timeDisplay = sEth && eEth
+      ? (currentLang === 'am' ? `${sEth.am} – ${eEth.am}` : `${sEth.civil} – ${eEth.civil}`)
+      : '';
+
+    const searchKeywords = [pin.name_am, pin.name_en, woredaNum ? `ወረዳ ${woredaNum}` : ''].filter(Boolean);
+    const targetQuote = pin.raw_text ? extractTargetQuote(pin.raw_text, searchKeywords) : null;
+
+    const popupHtml = `
+      <div class="p-1 space-y-2 text-slate-100 min-w-[220px] max-w-[280px]">
+        <div class="flex items-start justify-between border-b border-slate-700/80 pb-1.5">
+          <div>
+            <div class="text-xs font-bold text-amber-400 flex items-center gap-1">
+              <span>📍</span>
+              <span>${escapeHtml(name)}</span>
+            </div>
+            <div class="text-[11px] text-slate-400">${escapeHtml(subcityName)} • Woreda ${escapeHtml(woredaNum)}</div>
+          </div>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-600/60 font-semibold uppercase">
+            ${t('legend_scheduled')}
+          </span>
+        </div>
+
+        ${
+          timeDisplay
+            ? `<div class="text-[11px] text-slate-300">
+                <span class="text-slate-400">🕒 ${t('time_label')}:</span> <span class="font-semibold text-white">${escapeHtml(timeDisplay)}</span>
+               </div>`
+            : ''
+        }
+
+        ${
+          targetQuote && targetQuote.highlightedLine
+            ? `<div class="text-[11px] text-slate-200 border-l-2 border-amber-400 pl-2 py-0.5 font-mono bg-slate-950/60 rounded-r text-xs">
+                ${targetQuote.highlightedLine}
+               </div>`
+            : ''
+        }
+
+        <div class="pt-1.5 border-t border-slate-700/80 flex flex-col gap-1.5">
+          ${
+            pin.woreda_id
+              ? `<button type="button" onclick="openWoredaModal(${pin.woreda_id})" class="w-full text-center py-1 px-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition">
+                  ${t('view_details_btn')}
+                 </button>`
+              : ''
+          }
+          ${
+            pin.source_url
+              ? `<a href="${pin.source_url}" target="_blank" rel="noopener noreferrer" class="text-center text-[11px] text-sky-400 hover:text-sky-300 underline font-medium">
+                  Open Telegram Post ↗
+                 </a>`
+              : ''
+          }
+        </div>
+      </div>
+    `;
+
+    marker.bindPopup(popupHtml, { className: 'leaflet-dark-popup' });
+    landmarkPinsLayer.addLayer(marker);
+  });
+}
+
+window.openWoredaModal = function (woredaId) {
+  const wid = Number(woredaId);
+  const feature = woredaFeatures.find((f) => f.properties.woreda_id === wid);
+  if (feature) {
+    openWoredaDetailModal(feature.properties, woredaStatusMap.get(wid));
+  }
+};
+
+window.zoomToLandmark = function (lat, lng, name) {
+  if (!mapInstance) return;
+  const modal = document.getElementById('detailModal');
+  if (modal) modal.classList.add('hidden');
+
+  switchView('map');
+  mapInstance.flyTo([lat, lng], 15, { duration: 1.2 });
+};
+
 // Render Outages List View
 function renderOutagesList() {
   const container = document.getElementById('outagesListContainer');
@@ -1140,6 +1313,21 @@ function renderOutagesList() {
           ${areas.length > 0 ? `<span>📍 ${areas.length} Woreda(s) affected</span>` : `<span>📍 Regional Town / Grid Substation</span>`}
           ${isHistory && o.scheduled_end ? `<span>🏁 Concluded at ${civilTimeDisplay.split('–')[1] || civilTimeDisplay}</span>` : ''}
         </div>
+        ${
+          Array.isArray(o.landmarks) && o.landmarks.length > 0
+            ? `<div class="mt-2.5 flex flex-wrap items-center gap-1.5">
+                <span class="text-[11px] font-semibold text-amber-400">📍 ${t('pinpoint_title')}:</span>
+                ${o.landmarks
+                  .map((lm) => {
+                    const lmName = currentLang === 'am' ? (lm.name_am || lm.name_en) : (lm.name_en || lm.name_am);
+                    return `<button type="button" onclick="zoomToLandmark(${lm.lat}, ${lm.lng}, '${escapeHtml(lmName)}')" class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-amber-950/70 hover:bg-amber-900 border border-amber-600/60 text-amber-300 transition font-medium shadow-sm">
+                      <span>📍</span><span>${escapeHtml(lmName)}</span><span class="text-[10px] text-amber-400">🎯</span>
+                    </button>`;
+                  })
+                  .join('')}
+               </div>`
+            : ''
+        }
         ${(() => {
           const searchKeywords = [
             o.region_name,
@@ -1214,6 +1402,21 @@ function renderCalendar() {
                   currentLang === 'am' ? s.reason_am || s.reason : s.reason || 'Maintenance'
                 }</div>
               </div>
+              ${
+                Array.isArray(s.landmarks) && s.landmarks.length > 0
+                  ? `<div class="mt-2 mb-1 flex flex-wrap items-center gap-1.5">
+                      <span class="text-[11px] font-semibold text-amber-400">📍 ${t('pinpoint_title')}:</span>
+                      ${s.landmarks
+                        .map((lm) => {
+                          const lmName = currentLang === 'am' ? (lm.name_am || lm.name_en) : (lm.name_en || lm.name_am);
+                          return `<button type="button" onclick="zoomToLandmark(${lm.lat}, ${lm.lng}, '${escapeHtml(lmName)}')" class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-amber-950/70 hover:bg-amber-900 border border-amber-600/60 text-amber-300 transition font-medium shadow-sm">
+                            <span>📍</span><span>${escapeHtml(lmName)}</span><span class="text-[10px] text-amber-400">🎯</span>
+                          </button>`;
+                        })
+                        .join('')}
+                     </div>`
+                  : ''
+              }
               ${(() => {
                 const calKeywords = [
                   s.region_name,

@@ -154,7 +154,7 @@ export async function buildApp(): Promise<FastifyInstance> {
     '/api/v1/map',
     {
       schema: {
-        description: 'Get all 116 Woredas with real-time evaluated status for interactive map styling',
+        description: 'Get all 116 Woredas with real-time evaluated status and interactive landmark pins',
         tags: ['Map'],
       },
     },
@@ -165,10 +165,76 @@ export async function buildApp(): Promise<FastifyInstance> {
       });
       const areaStatuses = await statusRes.json();
 
+      // Fetch active/upcoming outages with landmarks for interactive pinpoint markers
+      const nowIso = new Date().toISOString();
+      const outagesRes = await supaFetch(
+        `outages?scheduled_end=gt.${nowIso}&select=id,status,reason,reason_am,scheduled_start,scheduled_end,source_url,ethiopian_date,raw_text,landmarks,outage_areas(woreda_id,subcity_id,woredas(full_name_en,full_name_am,woreda_number,subcities(name_en,name_am)))`
+      );
+      const activeOutages = await outagesRes.json();
+
+      const landmarkPins: Array<{
+        name_en: string;
+        name_am: string;
+        lat: number;
+        lng: number;
+        woreda_id: number;
+        woreda_number: string;
+        subcity_id: number;
+        subcity_en: string;
+        subcity_am: string;
+        full_name_en?: string;
+        full_name_am?: string;
+        outage_id: string;
+        status: string;
+        reason?: string;
+        reason_am?: string;
+        scheduled_start?: string;
+        scheduled_end?: string;
+        source_url?: string;
+        ethiopian_date?: string;
+        raw_text?: string;
+      }> = [];
+
+      const seenPins = new Set<string>();
+      if (Array.isArray(activeOutages)) {
+        for (const out of activeOutages) {
+          const lms = Array.isArray(out.landmarks) ? out.landmarks : [];
+          for (const lm of lms) {
+            const pinKey = `${lm.lat?.toFixed?.(4) || lm.lat},${lm.lng?.toFixed?.(4) || lm.lng},${lm.name_en}`;
+            if (seenPins.has(pinKey)) continue;
+            seenPins.add(pinKey);
+
+            landmarkPins.push({
+              name_en: lm.name_en,
+              name_am: lm.name_am,
+              lat: lm.lat,
+              lng: lm.lng,
+              woreda_id: lm.woreda_id,
+              woreda_number: lm.woreda_number,
+              subcity_id: lm.subcity_id,
+              subcity_en: lm.subcity_en,
+              subcity_am: lm.subcity_am,
+              full_name_en: lm.full_name_en,
+              full_name_am: lm.full_name_am,
+              outage_id: out.id,
+              status: out.status || 'SCHEDULED',
+              reason: out.reason,
+              reason_am: out.reason_am,
+              scheduled_start: out.scheduled_start,
+              scheduled_end: out.scheduled_end,
+              source_url: out.source_url,
+              ethiopian_date: out.ethiopian_date,
+              raw_text: out.raw_text,
+            });
+          }
+        }
+      }
+
       return {
         timestamp: new Date().toISOString(),
         total_areas: Array.isArray(areaStatuses) ? areaStatuses.length : 0,
         data: areaStatuses,
+        landmark_pins: landmarkPins,
       };
     }
   );

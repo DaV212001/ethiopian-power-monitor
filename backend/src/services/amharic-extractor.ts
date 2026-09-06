@@ -13,6 +13,35 @@ import {
   parseEthiopianDateFromText,
   gregorianToEthiopian,
 } from './ethiopian-calendar';
+import rawGazetteer from '../data/addis-landmarks.json';
+
+export interface LandmarkPin {
+  name_en: string;
+  name_am: string;
+  lng: number;
+  lat: number;
+  woreda_id: number;
+  woreda_number: string;
+  subcity_id: number;
+  subcity_en: string;
+  subcity_am: string;
+  full_name_en?: string;
+  full_name_am?: string;
+}
+
+export interface LandmarkGazetteerEntry {
+  name_en: string;
+  name_am: string;
+  coordinates: [number, number];
+  woreda_id: number;
+  woreda_number: string;
+  subcity_id: number;
+  subcity_en: string;
+  subcity_am: string;
+  full_name_en: string;
+  full_name_am: string;
+  patterns: string[];
+}
 
 export interface AddisWoredaTarget {
   subcity_id: number;
@@ -35,6 +64,7 @@ export interface ScheduleBlock {
   is_addis_ababa: boolean;
   addis_targets: AddisWoredaTarget[];
   all_woredas: string[];
+  landmarks: LandmarkPin[];
   confidence: number;
 }
 
@@ -56,6 +86,7 @@ export interface ExtractedAnnouncement {
   area_targets: AddisWoredaTarget[];
   woredas: string[];
   neighborhoods: string[];
+  landmarks: LandmarkPin[];
   confidence: number;
   needs_admin_review: boolean;
   sub_city_en?: string;
@@ -80,155 +111,34 @@ export const SUBCITY_DICTIONARY = [
   { id: 10, en: 'Yeka', am: 'የካ', patterns: [/የካ/i, /yeka/i] },
 ];
 
-// 2. Addis Ababa Landmark & Border Neighborhood Mapping
+// 2. Addis Ababa Landmark & Border Neighborhood Mapping (PostGIS-verified single woreda containment)
 export const ADDIS_LANDMARK_MAP: Array<{
   name_en: string;
   name_am: string;
+  coordinates: [number, number];
+  woreda_id: number;
+  woreda_number: string;
   subcity_id: number;
+  subcity_en: string;
+  subcity_am: string;
+  full_name_en?: string;
+  full_name_am?: string;
   woredas: string[];
   patterns: RegExp[];
-}> = [
-  {
-    name_en: 'Burayu / Tserha Tsion / Beg Tera',
-    name_am: 'ቡራዩ / ጽርሐ ጽዮን / በግ ተራ',
-    subcity_id: 7, // Kolfe Keranyo border
-    woredas: ['01', '02'],
-    patterns: [/ቡራዩ/i, /ጽርሐ\s*ጽዮን/i, /በግ\s*ተራ/i, /burayu/i],
-  },
-  {
-    name_en: 'Kera',
-    name_am: 'ቄራ',
-    subcity_id: 6, // Kirkos
-    woredas: ['04', '05'],
-    patterns: [/ቄራ/i, /kera/i],
-  },
-  {
-    name_en: 'Shekla Sefer',
-    name_am: 'ሸክላ ሰፈር',
-    subcity_id: 5, // Gulele
-    woredas: ['06'],
-    patterns: [/ሸክላ\s*ሰፈር/i],
-  },
-  {
-    name_en: 'Gofa Camp / Kore / Fana',
-    name_am: 'ጎፋ ካምፕ / ቆሬ / ፋና',
-    subcity_id: 9, // Nefas Silk Lafto
-    woredas: ['05', '06'],
-    patterns: [/ጎፋ\s*ካምፕ/i, /ጎፋ/i, /ቆሬ/i, /ፋና/i, /gofa/i],
-  },
-  {
-    name_en: 'Mekanisa / Amigo Condominium',
-    name_am: 'መካኒሳ / አሚጎ',
-    subcity_id: 9, // Nefas Silk Lafto
-    woredas: ['02', '03'],
-    patterns: [/መካኒሳ/i, /አሚጎ/i, /mekanisa/i],
-  },
-  {
-    name_en: 'Koye Feche Projects',
-    name_am: 'ኮዬ ፈጬ',
-    subcity_id: 2, // Akaki Kality
-    woredas: ['09', '10'],
-    patterns: [/ኮዬ\s*05/i, /ኮዬ\s*ፈጬ/i, /ኮዬ/i, /koye/i],
-  },
-  {
-    name_en: 'Kazanchis',
-    name_am: 'ካዛንቺስ',
-    subcity_id: 6,
-    woredas: ['08', '09'],
-    patterns: [/ካዛንቺስ/i, /kazanchis/i],
-  },
-  {
-    name_en: 'Bole Medhanialem',
-    name_am: 'ቦሌ መድኃኒዓለም',
-    subcity_id: 4,
-    woredas: ['03'],
-    patterns: [/ቦሌ\s*መድኃኒዓለም/i, /bole\s*medhanialem/i],
-  },
-  {
-    name_en: 'Gerji',
-    name_am: 'ገርጂ',
-    subcity_id: 4,
-    woredas: ['11', '12'],
-    patterns: [/ገርጂ/i, /gerji/i],
-  },
-  {
-    name_en: 'CMC',
-    name_am: 'ሲኤምሲ',
-    subcity_id: 10,
-    woredas: ['10', '11'],
-    patterns: [/ሲኤምሲ/i, /\bcmc\b/i],
-  },
-  {
-    name_en: 'Megenagna',
-    name_am: 'መገናኛ',
-    subcity_id: 10,
-    woredas: ['08', '09'],
-    patterns: [/መገናኛ/i, /megenagna/i],
-  },
-  {
-    name_en: 'Piazza',
-    name_am: 'ፒያሳ',
-    subcity_id: 3,
-    woredas: ['01', '02'],
-    patterns: [/ፒያሳ/i, /piazza/i],
-  },
-  {
-    name_en: 'Saris',
-    name_am: 'ሳሪስ',
-    subcity_id: 2,
-    woredas: ['05', '06'],
-    patterns: [/ሳሪስ/i, /saris/i],
-  },
-  {
-    name_en: '22 Mazoriya',
-    name_am: 'ሃያ ሁለት',
-    subcity_id: 10,
-    woredas: ['05', '06'],
-    patterns: [/ሃያ\s*ሁለት/i, /(?:^|[^\d])22\s*ማዞሪያ/i, /(?:^|[^\d])22\s*(?:አካባቢ|mazoriya)/i],
-  },
-  {
-    name_en: 'Mexico',
-    name_am: 'ሜክሲኮ',
-    subcity_id: 6,
-    woredas: ['01', '02'],
-    patterns: [/ሜክሲኮ/i, /mexico/i],
-  },
-  {
-    name_en: 'Gotera',
-    name_am: 'ጎተራ',
-    subcity_id: 6,
-    woredas: ['03', '04'],
-    patterns: [/ጎተራ/i, /gotera/i],
-  },
-  {
-    name_en: 'Ayat',
-    name_am: 'አያት',
-    subcity_id: 10,
-    woredas: ['12', '13'],
-    patterns: [/አያት/i, /ayat/i],
-  },
-  {
-    name_en: 'Goro / Summit',
-    name_am: 'ጎሮ / ሰሚት',
-    subcity_id: 4,
-    woredas: ['13', '14'],
-    patterns: [/ጎሮ/i, /ሰሚት/i, /goro/i, /summit/i],
-  },
-  {
-    name_en: 'Jemo / Lebu',
-    name_am: 'ጀሞ / ሌቡ',
-    subcity_id: 9,
-    woredas: ['01', '08'],
-    patterns: [/ጀሞ/i, /ሌቡ/i, /jemo/i, /lebu/i],
-  },
-  {
-    name_en: 'Merkato / Autobus Tera',
-    name_am: 'መርካቶ / አውቶቡስ ተራ',
-    subcity_id: 1,
-    woredas: ['01', '02', '05'],
-    patterns: [/መርካቶ/i, /አውቶቡስ\s*ተራ/i, /merkato/i],
-  },
-];
+}> = (rawGazetteer as LandmarkGazetteerEntry[]).map((entry) => ({
+  name_en: entry.name_en,
+  name_am: entry.name_am,
+  coordinates: entry.coordinates,
+  woreda_id: entry.woreda_id,
+  woreda_number: entry.woreda_number,
+  subcity_id: entry.subcity_id,
+  subcity_en: entry.subcity_en,
+  subcity_am: entry.subcity_am,
+  full_name_en: entry.full_name_en,
+  full_name_am: entry.full_name_am,
+  woredas: [entry.woreda_number], // EXACT SINGLE WOREDA!
+  patterns: entry.patterns.map((p) => new RegExp(p, 'i')),
+}));
 
 // 3. Ethiopian Regional Cities & Hubs Ontology
 export const REGIONAL_HUB_MAP: Array<{
@@ -450,25 +360,43 @@ export function extractMultiBlockOutage(text: string, referenceDate: Date = new 
     }
 
     // B. Check Addis Ababa Landmarks
+    const blockLandmarks: LandmarkPin[] = [];
     for (const lm of ADDIS_LANDMARK_MAP) {
       if (lm.patterns.some((p) => p.test(fullBlockText))) {
         isAddis = true;
         allAggregatedNeighborhoods.add(lm.name_en);
-        const sc = SUBCITY_DICTIONARY.find((s) => s.id === lm.subcity_id)!;
-        const hasExplicitForSubcity = addisTargets.some(
-          (t) => t.subcity_id === lm.subcity_id && t.neighborhood === 'Explicitly Announced Woredas'
+
+        if (!blockLandmarks.some((pin) => pin.name_en === lm.name_en)) {
+          blockLandmarks.push({
+            name_en: lm.name_en,
+            name_am: lm.name_am,
+            lng: lm.coordinates[0],
+            lat: lm.coordinates[1],
+            woreda_id: lm.woreda_id,
+            woreda_number: lm.woreda_number,
+            subcity_id: lm.subcity_id,
+            subcity_en: lm.subcity_en,
+            subcity_am: lm.subcity_am,
+            full_name_en: lm.full_name_en,
+            full_name_am: lm.full_name_am,
+          });
+        }
+
+        lm.woredas.forEach((w) => {
+          matchedWoredas.add(w);
+          allAggregatedWoredas.add(w);
+        });
+
+        const alreadyHasWoreda = addisTargets.some(
+          (t) => t.subcity_id === lm.subcity_id && t.woreda_numbers.includes(lm.woreda_number)
         );
 
-        if (!hasExplicitForSubcity) {
-          lm.woredas.forEach((w) => {
-            matchedWoredas.add(w);
-            allAggregatedWoredas.add(w);
-          });
+        if (!alreadyHasWoreda) {
           addisTargets.push({
-            subcity_id: sc.id,
-            subcity_en: sc.en,
-            subcity_am: sc.am,
-            woreda_numbers: lm.woredas,
+            subcity_id: lm.subcity_id,
+            subcity_en: lm.subcity_en,
+            subcity_am: lm.subcity_am,
+            woreda_numbers: [lm.woreda_number], // EXACT single woreda!
             neighborhood: lm.name_en,
           });
         }
@@ -501,15 +429,22 @@ export function extractMultiBlockOutage(text: string, referenceDate: Date = new 
       is_addis_ababa: isAddis,
       addis_targets: addisTargets,
       all_woredas: Array.from(matchedWoredas).sort(),
+      landmarks: blockLandmarks,
       confidence: Math.min(100, conf),
     });
   }
 
   const firstAddis = parsedBlocks.find((b) => b.is_addis_ababa && b.addis_targets.length > 0);
   const allAreaTargets: AddisWoredaTarget[] = [];
+  const allAggregatedLandmarks: LandmarkPin[] = [];
   for (const b of parsedBlocks) {
     for (const t of b.addis_targets) {
       allAreaTargets.push(t);
+    }
+    for (const lm of b.landmarks) {
+      if (!allAggregatedLandmarks.some((x) => x.name_en === lm.name_en)) {
+        allAggregatedLandmarks.push(lm);
+      }
     }
   }
 
@@ -537,6 +472,7 @@ export function extractMultiBlockOutage(text: string, referenceDate: Date = new 
     area_targets: allAreaTargets,
     woredas: Array.from(allAggregatedWoredas).sort(),
     neighborhoods: Array.from(allAggregatedNeighborhoods),
+    landmarks: allAggregatedLandmarks,
     confidence: finalConfidence,
     needs_admin_review: needsAdminReview,
     sub_city_en: firstAddis ? firstAddis.addis_targets[0]?.subcity_en : undefined,
