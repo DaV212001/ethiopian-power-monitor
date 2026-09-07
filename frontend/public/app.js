@@ -152,7 +152,7 @@ let landmarkPinsLayer = null;
 let mapLandmarkPins = [];
 let woredaFeatures = [];
 let woredaStatusMap = new Map();
-let currentView = 'map'; // 'map', 'outages', 'calendar', 'areas', 'admin'
+let currentView = 'grid-overview'; // 'grid-overview', 'woreda-details', 'maintenance', 'citizen-reports'
 let allOutages = []; // Active and Upcoming outages (past stripped out)
 let historyOutages = []; // Concluded historical outages (strictly capped to 30)
 let selectedOutagesScope = 'upcoming'; // 'upcoming' or 'history'
@@ -171,6 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadData();
   initSearch();
   initReportModal();
+  switchView('grid-overview');
 });
 
 // Live Grid Telemetry HUD (GMT+3 EAT & Ethiopian Dual Clock/Date Ticker)
@@ -209,14 +210,17 @@ function initLiveClockHud() {
           activeCount++;
         }
       });
+      const dotEl = document.getElementById('gridStatusDot');
       if (activeCount > 0) {
         statusEl.textContent = `GRID ALERT: ${activeCount} AREAS IMPACTED`;
-        statusEl.previousElementSibling?.classList.remove('led-emerald');
-        statusEl.previousElementSibling?.classList.add('led-crimson');
+        if (dotEl) {
+          dotEl.className = 'w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.8)] pulse-dot';
+        }
       } else {
         statusEl.textContent = `GRID NOMINAL • 116 WOREDAS MONITORED`;
-        statusEl.previousElementSibling?.classList.remove('led-crimson');
-        statusEl.previousElementSibling?.classList.add('led-emerald');
+        if (dotEl) {
+          dotEl.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(34,197,94,0.8)] led-emerald';
+        }
       }
     }
   }
@@ -316,6 +320,25 @@ function applyTranslations() {
 }
 
 function initNavigation() {
+  // Handle sidebar navigation links
+  document.querySelectorAll('.side-nav-link').forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = link.getAttribute('data-view');
+      switchView(target);
+    });
+  });
+
+  // Handle top navigation tabs
+  document.querySelectorAll('.top-nav-tab').forEach((tab) => {
+    tab.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = tab.getAttribute('data-view');
+      switchView(target);
+    });
+  });
+
+  // Handle legacy nav links if any
   document.querySelectorAll('.nav-link').forEach((link) => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
@@ -323,6 +346,33 @@ function initNavigation() {
       switchView(target);
     });
   });
+
+  // Mobile menu toggle
+  const mobileBtn = document.getElementById('mobileMenuBtn');
+  const sideNav = document.getElementById('sideNav');
+  if (mobileBtn && sideNav) {
+    mobileBtn.addEventListener('click', () => {
+      sideNav.classList.toggle('-translate-x-full');
+    });
+  }
+
+  // Reset map view button
+  const resetMapBtn = document.getElementById('resetMapBtn');
+  if (resetMapBtn) {
+    resetMapBtn.addEventListener('click', () => {
+      if (mapInstance) {
+        mapInstance.flyTo([9.0105, 38.7612], 11, { duration: 1.2 });
+      }
+    });
+  }
+
+  // Admin audit drawer trigger in sidebar
+  const adminDrawerBtn = document.getElementById('adminDrawerBtn');
+  if (adminDrawerBtn) {
+    adminDrawerBtn.addEventListener('click', () => {
+      switchView('citizen-reports');
+    });
+  }
 
   // Global keyboard shortcut '/' to focus search
   document.addEventListener('keydown', (e) => {
@@ -341,6 +391,7 @@ function initNavigation() {
     }
   });
 
+  // Close modals when clicking backdrop or close buttons
   const detailModal = document.getElementById('detailModal');
   if (detailModal) {
     detailModal.addEventListener('click', (e) => {
@@ -349,34 +400,85 @@ function initNavigation() {
       }
     });
   }
+  const closeDetailBtns = [
+    document.getElementById('closeDetailModalBtn'),
+    document.getElementById('closeDetailModalBtn2'),
+  ];
+  closeDetailBtns.forEach((btn) => {
+    if (btn) btn.addEventListener('click', () => detailModal?.classList.add('hidden'));
+  });
+}
+
+function getCanonicalView(viewName) {
+  if (!viewName) return 'grid-overview';
+  if (viewName === 'map' || viewName === 'outages' || viewName === 'grid-overview') {
+    return 'grid-overview';
+  }
+  if (viewName === 'areas' || viewName === 'woredas' || viewName === 'woreda-details') {
+    return 'woreda-details';
+  }
+  if (viewName === 'calendar' || viewName === 'maintenance') {
+    return 'maintenance';
+  }
+  if (viewName === 'admin' || viewName === 'reports' || viewName === 'citizen-reports') {
+    return 'citizen-reports';
+  }
+  return viewName;
 }
 
 function switchView(viewName) {
-  currentView = viewName;
-  document.querySelectorAll('.view-section').forEach((sec) => sec.classList.add('hidden'));
-  document.querySelectorAll('.nav-link').forEach((link) => {
-    link.classList.remove('text-[#4cd7f6]', 'bg-cyan-950/40', 'border', 'border-cyan-500/30', 'shadow-sm');
-    link.classList.add('text-slate-300');
-  });
+  const canonical = getCanonicalView(viewName);
+  currentView = canonical;
 
-  const activeSec = document.getElementById(`view-${viewName}`);
+  // Hide all view panels
+  document.querySelectorAll('.view-panel').forEach((sec) => sec.classList.add('hidden'));
+  document.querySelectorAll('.view-section').forEach((sec) => sec.classList.add('hidden'));
+
+  // Show active view panel
+  const activeSec = document.getElementById(`view-${canonical}`);
   if (activeSec) activeSec.classList.remove('hidden');
 
-  const activeLink = document.querySelector(`.nav-link[data-view="${viewName}"]`);
-  if (activeLink) {
-    activeLink.classList.remove('text-slate-300');
-    activeLink.classList.add('text-[#4cd7f6]', 'bg-cyan-950/40', 'border', 'border-cyan-500/30', 'shadow-sm');
+  // Update Side Navigation styling
+  document.querySelectorAll('.side-nav-link').forEach((link) => {
+    const linkView = getCanonicalView(link.getAttribute('data-view'));
+    if (linkView === canonical) {
+      link.className =
+        'side-nav-link active bg-primary-container text-on-primary-container font-bold rounded-lg flex items-center gap-3 px-4 py-2.5 font-body-md text-sm transition-all shadow-[0_0_15px_-5px_rgba(6,182,212,0.3)] border border-primary/20';
+    } else {
+      link.className =
+        'side-nav-link text-on-surface-variant hover:bg-surface-container-high rounded-lg flex items-center gap-3 px-4 py-2.5 font-body-md text-sm transition-all hover:text-primary';
+    }
+  });
+
+  // Update Top Navigation styling
+  document.querySelectorAll('.top-nav-tab').forEach((tab) => {
+    const tabView = getCanonicalView(tab.getAttribute('data-view'));
+    if (tabView === canonical) {
+      tab.className =
+        'top-nav-tab text-primary border-b-2 border-primary pb-1 font-semibold text-sm transition-all';
+    } else {
+      tab.className =
+        'top-nav-tab text-on-surface-variant hover:text-primary pb-1 font-medium text-sm transition-all';
+    }
+  });
+
+  // Close mobile drawer if open on small screens
+  const sideNav = document.getElementById('sideNav');
+  if (sideNav && window.innerWidth < 768) {
+    sideNav.classList.add('-translate-x-full');
   }
 
-  if (viewName === 'map' && mapInstance) {
-    setTimeout(() => mapInstance.invalidateSize(), 200);
-  } else if (viewName === 'outages') {
+  // View specific activations
+  if (canonical === 'grid-overview') {
     renderOutagesList();
-  } else if (viewName === 'calendar') {
-    renderCalendar();
-  } else if (viewName === 'areas') {
+    if (mapInstance) {
+      setTimeout(() => mapInstance.invalidateSize(), 150);
+    }
+  } else if (canonical === 'woreda-details') {
     renderAreasDirectory();
-  } else if (viewName === 'admin') {
+  } else if (canonical === 'maintenance') {
+    renderCalendar();
+  } else if (canonical === 'citizen-reports') {
     renderAdminQueue();
   }
 }
