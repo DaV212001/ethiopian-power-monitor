@@ -204,11 +204,16 @@ export function parseEthiopianTime(timeStr?: string, isMorningDefault = true): {
 }
 
 function cleanAmharicToken(token: string): string {
-  let t = token.replace(/&nbsp;/gi, ' ').trim().replace(/^[👉✅•\-\s]+/, '').replace(/[\s፣,]+$/, '');
+  let t = token
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/[👉✅•\-\*\(\)\[\]"']/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/[\s፣,]+$/, '');
   if (t.startsWith('በ') && t.length > 2) {
-    t = t.slice(1);
+    t = t.slice(1).trim();
   }
-  t = t.replace(/\s*(?:እና\s*)?አካባቢው(?:ች)?/i, '').trim();
+  t = t.replace(/\s*(?:እና\s*)?አካባቢ(?:ው)?(?:ች)?/i, '').trim();
   return t;
 }
 
@@ -318,9 +323,15 @@ export function extractMultiBlockOutage(text: string, referenceDate: Date = new 
     }
 
     const rawTokens = fullBlockText
-      .split(/[፣,\n]+/)
+      .split(/[፣,\n👉•;\-]+|\s+እና\s+|\s{2,}/)
       .map(cleanAmharicToken)
-      .filter((t) => t.length > 1 && !/^(?:ስለሆነም|በአካባቢው|ይቋረጣል|ክቡራን|ደንበኞቻችን)/.test(t));
+      .filter(
+        (t) =>
+          t.length > 1 &&
+          !/^(?:ስለሆነም|በአካባቢው|ይቋረጣል|ክቡራን|ደንበኞቻችን|የጥገና|ሥራ|ለማከናወን|የኃይል|አቅርቦት|የሚቋረጥባቸው|ነገ|ዛሬ|ከጠዋቱ|ከቀኑ|ከሰዓት|ከምሽቱ)/.test(t) &&
+          !/^\d{1,2}(?::\d{2})?$/.test(t) &&
+          !/\b(?:ቀን|ዓ\.ም|ዓም)\b/.test(t)
+      );
 
     const addisTargets: AddisWoredaTarget[] = [];
     const matchedWoredas = new Set<string>();

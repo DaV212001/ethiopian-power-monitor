@@ -136,15 +136,24 @@ export class TelegramIngestionService {
     // 3. Trigger Hybrid Amharic Extraction (Deterministic fast-path + Gemini 3.8 Flash Semantic/Multimodal fallback)
     let extracted = extractOutageFromText(msg.raw_text, new Date(msg.published_at));
     let extractorType = 'DETERMINISTIC_RULES';
+    let isExplicitNonOutage = false;
 
     const hasMedia = Array.isArray(msg.media_urls) && msg.media_urls.length > 0;
     const isLowConfidence = extracted.needs_admin_review || extracted.confidence < 85;
 
+    // Only invoke Multimodal OCR if the post actually relies on an image for the schedule
+    // (e.g. text is short/placeholder, or 0 schedule blocks found from text, or explicit flyer mention)
+    const needsFlyerOcr =
+      hasMedia &&
+      ((msg.raw_text || '').length < 80 ||
+        (msg.raw_text || '').includes('[Official Schedule Flyer Graphic]') ||
+        extracted.blocks.length === 0 ||
+        /በምስሉ\s*ላይ|ተመልከቱ|flyer|graphic/i.test(msg.raw_text || ''));
+
     if (this.geminiParser.isAvailable()) {
       try {
-        if (hasMedia) {
-          // If flyer graphic is present, invoke Gemini 3.8 Flash Multimodal OCR
-          console.log(`[TelegramIngestion] Invoking Gemini 3.8 Flash Multimodal OCR on flyer: ${msg.media_urls![0]}`);
+        if (needsFlyerOcr) {
+          console.log(`[TelegramIngestion] Invoking Gemini 3.8 Flash Multimodal OCR on schedule flyer: ${msg.media_urls![0]}`);
           const geminiResult = await this.geminiParser.parseFlyerImage(
             msg.media_urls![0],
             msg.caption || msg.raw_text,
@@ -154,6 +163,8 @@ export class TelegramIngestionService {
             extracted = convertGeminiToExtracted(geminiResult, new Date(msg.published_at), msg.raw_text);
             extractorType = 'GEMINI_3_8_FLASH_MULTIMODAL';
             console.log(`[TelegramIngestion] Extracted ${extracted.blocks.length} schedule blocks from flyer image!`);
+          } else if (geminiResult && geminiResult.is_outage_announcement === false) {
+            isExplicitNonOutage = true;
           }
         } else if (isLowConfidence) {
           // If text is low confidence or unrecognized, invoke Gemini 3.8 Flash semantic reasoning
@@ -166,11 +177,24 @@ export class TelegramIngestionService {
             extracted = convertGeminiToExtracted(geminiResult, new Date(msg.published_at), msg.raw_text);
             extractorType = 'GEMINI_3_8_FLASH_TEXT';
             console.log(`[TelegramIngestion] Gemini 3.8 Flash extracted ${extracted.blocks.length} blocks (confidence: ${extracted.confidence}%)`);
+          } else if (geminiResult && geminiResult.is_outage_announcement === false) {
+            isExplicitNonOutage = true;
           }
         }
       } catch (geminiErr: any) {
         console.warn(`[TelegramIngestion] Gemini 3.8 Flash fallback encountered an error: ${geminiErr.message}. Falling back to deterministic rules.`);
       }
+    }
+
+    if (isExplicitNonOutage) {
+      console.log(`[TelegramIngestion] Post ${msg.id} classified by Gemini as non-outage content (PR/greetings). Skipped review queue.`);
+      return {
+        raw_announcement_id: rawId,
+        is_duplicate: false,
+        content_hash: contentHash,
+        extracted,
+        status: 'PROCESSED_AUTOMATIC',
+      };
     }
 
     // 4. Save Extraction Audit record

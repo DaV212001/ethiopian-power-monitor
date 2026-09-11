@@ -138,6 +138,7 @@ export class GeminiParserService {
 
   /**
    * Helper to execute content generation with automatic failover between 3.8-flash and 3.6-flash
+   * Includes exponential backoff for transient 503 high-demand or 429 rate limit spikes.
    */
   private async executeWithFallback(
     contents: any,
@@ -150,25 +151,42 @@ export class GeminiParserService {
     );
 
     for (const model of modelsToTry) {
-      try {
-        const response = await this.client.models.generateContent({
-          model,
-          contents,
-          config: {
-            responseMimeType: 'application/json',
-            responseSchema: OutageExtractionSchema,
-            temperature: 0.1,
-          },
-        });
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        try {
+          const response = await this.client.models.generateContent({
+            model,
+            contents,
+            config: {
+              responseMimeType: 'application/json',
+              responseSchema: OutageExtractionSchema,
+              temperature: 0.1,
+            },
+          });
 
-        if (response.text) {
-          return response.text;
+          if (response.text) {
+            return response.text;
+          }
+        } catch (err: any) {
+          const isRetryable =
+            err.message?.includes('503') ||
+            err.message?.includes('429') ||
+            err.message?.includes('high demand') ||
+            err.message?.includes('UNAVAILABLE');
+
+          console.warn(
+            `[GeminiParserService] ${taskDescription} failed with ${model} (attempt ${attempt}): ${err.message}.`
+          );
+
+          if (isRetryable && attempt === 1) {
+            const backoffMs = 1500;
+            console.log(`[GeminiParserService] Retrying ${model} after ${backoffMs}ms backoff...`);
+            await new Promise((r) => setTimeout(r, backoffMs));
+          }
         }
-      } catch (err: any) {
-        console.warn(`[GeminiParserService] ${taskDescription} failed with ${model}: ${err.message}.`);
-        if (model !== modelsToTry[modelsToTry.length - 1]) {
-          console.log(`[GeminiParserService] Retrying with backup model...`);
-        }
+      }
+
+      if (model !== modelsToTry[modelsToTry.length - 1]) {
+        console.log(`[GeminiParserService] Switching to backup model...`);
       }
     }
 

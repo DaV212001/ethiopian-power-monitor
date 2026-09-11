@@ -86,7 +86,7 @@ export class GeocodingService {
    */
   public cleanToken(raw: string): string {
     if (!raw) return '';
-    let t = raw.replace(/[👉✅•\-\*\(\)\[\]"']/g, ' ').trim();
+    let t = raw.replace(/[👉✅•\-\*\(\)\[\]"']/g, ' ').replace(/\s+/g, ' ').trim();
 
     // Strip leading prepositions: በ..., ከ..., ወ..., ለ... (when string is long enough)
     if (/^[በከወለ][\u1200-\u137F]{2,}/.test(t)) {
@@ -113,7 +113,6 @@ export class GeocodingService {
     try {
       const resp = await fetch(url);
       if (!resp.ok) {
-        console.warn(`[GeocodingService] Gebeta Maps returned HTTP ${resp.status}`);
         return null;
       }
 
@@ -134,7 +133,6 @@ export class GeocodingService {
       }
       return null;
     } catch (err: any) {
-      console.warn(`[GeocodingService] Gebeta Maps query failed for "${query}":`, err.message);
       return null;
     }
   }
@@ -165,15 +163,19 @@ export class GeocodingService {
     }
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+
       const resp = await fetch(`${baseUrl}?${params.toString()}`, {
+        signal: controller.signal,
         headers: {
           'User-Agent': 'EthiopianPowerMonitor/1.0 (contact@power-monitor.et)',
           'Accept-Language': 'am,en',
         },
       });
+      clearTimeout(timeoutId);
 
       if (!resp.ok) {
-        console.warn(`[GeocodingService] OSM Nominatim returned HTTP ${resp.status}`);
         return null;
       }
 
@@ -183,7 +185,7 @@ export class GeocodingService {
       }
       return null;
     } catch (err: any) {
-      console.error(`[GeocodingService] OSM query error for "${query}":`, err.message);
+      // Silent fallback if OSM is blocked, unreachable, or rate limited
       return null;
     }
   }
