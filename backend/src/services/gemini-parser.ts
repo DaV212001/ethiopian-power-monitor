@@ -137,7 +137,46 @@ export class GeminiParserService {
   }
 
   /**
-   * Parse narrative or complex text using Gemini 3.8 Flash
+   * Helper to execute content generation with automatic failover between 3.8-flash and 3.6-flash
+   */
+  private async executeWithFallback(
+    contents: any,
+    taskDescription: string
+  ): Promise<string | null> {
+    if (!this.isAvailable() || !this.client) return null;
+
+    const modelsToTry = [this.modelName, 'gemini-3.6-flash'].filter(
+      (m, i, arr) => arr.indexOf(m) === i
+    );
+
+    for (const model of modelsToTry) {
+      try {
+        const response = await this.client.models.generateContent({
+          model,
+          contents,
+          config: {
+            responseMimeType: 'application/json',
+            responseSchema: OutageExtractionSchema,
+            temperature: 0.1,
+          },
+        });
+
+        if (response.text) {
+          return response.text;
+        }
+      } catch (err: any) {
+        console.warn(`[GeminiParserService] ${taskDescription} failed with ${model}: ${err.message}.`);
+        if (model !== modelsToTry[modelsToTry.length - 1]) {
+          console.log(`[GeminiParserService] Retrying with backup model...`);
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Parse narrative or complex text using Gemini 3.8 Flash (with 3.6 Flash fallback)
    */
   public async parseText(
     rawText: string,
@@ -155,26 +194,18 @@ Important Rules:
 3. Extract all affected subcities, woreda numbers, and landmark neighborhoods.
 4. If this is a corporate PR post, executive appointment, or general payment reminder without actual power cut times/areas, set is_outage_announcement to false.`;
 
+    const responseText = await this.executeWithFallback(
+      [{ role: 'user', parts: [{ text: `${systemPrompt}\n\nAnnouncement Text:\n${rawText}` }] }],
+      'Text parsing'
+    );
+
+    if (!responseText) return null;
+
     try {
-      const response = await this.client.models.generateContent({
-        model: this.modelName,
-        contents: [
-          { role: 'user', parts: [{ text: `${systemPrompt}\n\nAnnouncement Text:\n${rawText}` }] },
-        ],
-        config: {
-          responseMimeType: 'application/json',
-          responseSchema: OutageExtractionSchema,
-          temperature: 0.1,
-        },
-      });
-
-      const responseText = response.text;
-      if (!responseText) return null;
-
       const parsed: GeminiParsedAnnouncement = JSON.parse(responseText);
       return parsed;
-    } catch (err: any) {
-      console.error(`[GeminiParserService] Text parsing failed with ${this.modelName}:`, err.message);
+    } catch (parseErr: any) {
+      console.error('[GeminiParserService] JSON parse error:', parseErr.message);
       return null;
     }
   }
@@ -224,9 +255,8 @@ Caption context: ${caption}`;
         };
       }
 
-      const response = await this.client.models.generateContent({
-        model: this.modelName,
-        contents: [
+      const responseText = await this.executeWithFallback(
+        [
           {
             role: 'user',
             parts: [
@@ -235,20 +265,15 @@ Caption context: ${caption}`;
             ],
           },
         ],
-        config: {
-          responseMimeType: 'application/json',
-          responseSchema: OutageExtractionSchema,
-          temperature: 0.1,
-        },
-      });
+        'Flyer OCR'
+      );
 
-      const responseText = response.text;
       if (!responseText) return null;
 
       const parsed: GeminiParsedAnnouncement = JSON.parse(responseText);
       return parsed;
     } catch (err: any) {
-      console.error(`[GeminiParserService] Flyer OCR failed with ${this.modelName}:`, err.message);
+      console.error(`[GeminiParserService] Flyer OCR failed:`, err.message);
       return null;
     }
   }
