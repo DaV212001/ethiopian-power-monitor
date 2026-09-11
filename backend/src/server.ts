@@ -82,6 +82,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   const ingestionService = new TelegramIngestionService({
     supabaseUrl: SUPABASE_URL,
     supabaseAnonKey: SUPABASE_ANON_KEY,
+    geminiApiKey: process.env.GEMINI_API_KEY,
   });
 
   const communityReportService = new CommunityReportService({

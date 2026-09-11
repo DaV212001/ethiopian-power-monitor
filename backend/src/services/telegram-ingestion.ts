@@ -7,6 +7,7 @@
 import crypto from 'crypto';
 import { extractOutageFromText, ExtractedOutage } from './amharic-extractor';
 import { GeocodingService } from './geocoding-service';
+import { GeminiParserService, convertGeminiToExtracted } from './gemini-parser';
 
 export interface TelegramRawMessage {
   id: string;
@@ -41,6 +42,7 @@ export class TelegramIngestionService {
   private supabaseUrl: string;
   private supabaseAnonKey: string;
   private geocodingService: GeocodingService;
+  private geminiParser: GeminiParserService;
 
   constructor(config: {
     channelId?: string;
@@ -49,6 +51,7 @@ export class TelegramIngestionService {
     supabaseUrl: string;
     supabaseAnonKey: string;
     gebetaApiKey?: string;
+    geminiApiKey?: string;
   }) {
     this.channelId = config.channelId || 'eeuethiopia';
     this.apiId = config.apiId || '28797551';
@@ -60,6 +63,14 @@ export class TelegramIngestionService {
       supabaseAnonKey: this.supabaseAnonKey,
       gebetaApiKey: config.gebetaApiKey || process.env.GEBETA_MAPS_API_KEY,
     });
+    this.geminiParser = new GeminiParserService(
+      config.geminiApiKey || process.env.GEMINI_API_KEY,
+      'gemini-3.8-flash'
+    );
+  }
+
+  public getGeminiParser(): GeminiParserService {
+    return this.geminiParser;
   }
 
   public getGeocodingService(): GeocodingService {
@@ -122,14 +133,51 @@ export class TelegramIngestionService {
     const insertedRaw = await insertRawRes.json();
     const rawId = insertedRaw?.[0]?.id;
 
-    // 3. Trigger Deterministic Amharic Extraction
-    const extracted = extractOutageFromText(msg.raw_text, new Date(msg.published_at));
+    // 3. Trigger Hybrid Amharic Extraction (Deterministic fast-path + Gemini 3.8 Flash Semantic/Multimodal fallback)
+    let extracted = extractOutageFromText(msg.raw_text, new Date(msg.published_at));
+    let extractorType = 'DETERMINISTIC_RULES';
+
+    const hasMedia = Array.isArray(msg.media_urls) && msg.media_urls.length > 0;
+    const isLowConfidence = extracted.needs_admin_review || extracted.confidence < 85;
+
+    if (this.geminiParser.isAvailable()) {
+      try {
+        if (hasMedia) {
+          // If flyer graphic is present, invoke Gemini 3.8 Flash Multimodal OCR
+          console.log(`[TelegramIngestion] Invoking Gemini 3.8 Flash Multimodal OCR on flyer: ${msg.media_urls![0]}`);
+          const geminiResult = await this.geminiParser.parseFlyerImage(
+            msg.media_urls![0],
+            msg.caption || msg.raw_text,
+            new Date(msg.published_at)
+          );
+          if (geminiResult && geminiResult.is_outage_announcement && geminiResult.blocks.length > 0) {
+            extracted = convertGeminiToExtracted(geminiResult, new Date(msg.published_at), msg.raw_text);
+            extractorType = 'GEMINI_3_8_FLASH_MULTIMODAL';
+            console.log(`[TelegramIngestion] Extracted ${extracted.blocks.length} schedule blocks from flyer image!`);
+          }
+        } else if (isLowConfidence) {
+          // If text is low confidence or unrecognized, invoke Gemini 3.8 Flash semantic reasoning
+          console.log(`[TelegramIngestion] Invoking Gemini 3.8 Flash on post ${msg.id} (deterministic confidence: ${extracted.confidence}%)`);
+          const geminiResult = await this.geminiParser.parseText(
+            msg.raw_text,
+            new Date(msg.published_at)
+          );
+          if (geminiResult && geminiResult.is_outage_announcement && geminiResult.blocks.length > 0) {
+            extracted = convertGeminiToExtracted(geminiResult, new Date(msg.published_at), msg.raw_text);
+            extractorType = 'GEMINI_3_8_FLASH_TEXT';
+            console.log(`[TelegramIngestion] Gemini 3.8 Flash extracted ${extracted.blocks.length} blocks (confidence: ${extracted.confidence}%)`);
+          }
+        }
+      } catch (geminiErr: any) {
+        console.warn(`[TelegramIngestion] Gemini 3.8 Flash fallback encountered an error: ${geminiErr.message}. Falling back to deterministic rules.`);
+      }
+    }
 
     // 4. Save Extraction Audit record
     const extractionRecord = {
       raw_announcement_id: rawId,
-      extractor_type: 'DETERMINISTIC_RULES',
-      version: '1.2.0',
+      extractor_type: extractorType,
+      version: '2.0.0',
       extracted_json: extracted,
       confidence_score: extracted.confidence,
       validation_status: extracted.needs_admin_review ? 'PENDING_REVIEW' : 'VALIDATED',

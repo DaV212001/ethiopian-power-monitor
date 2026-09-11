@@ -8,7 +8,7 @@ import { TelegramIngestionService, TelegramRawMessage } from './telegram-ingesti
 
 export class TelegramPoller {
   private ingestionService: TelegramIngestionService;
-  private channelUsername: string;
+  private channels: string[];
   private intervalMs: number;
   private isRunning: boolean = false;
   private timer: NodeJS.Timeout | null = null;
@@ -16,23 +16,32 @@ export class TelegramPoller {
   constructor(config: {
     ingestionService: TelegramIngestionService;
     channelUsername?: string;
+    channels?: string[];
     intervalMs?: number;
   }) {
     this.ingestionService = config.ingestionService;
-    this.channelUsername = config.channelUsername || 'eeuethiopia';
+    if (config.channels && config.channels.length > 0) {
+      this.channels = config.channels.map((c) => c.replace(/^@/, '').trim()).filter(Boolean);
+    } else if (config.channelUsername) {
+      this.channels = [config.channelUsername.replace(/^@/, '').trim()];
+    } else if (process.env.TELEGRAM_CHANNELS) {
+      this.channels = process.env.TELEGRAM_CHANNELS.split(',').map((c) => c.replace(/^@/, '').trim()).filter(Boolean);
+    } else {
+      this.channels = [(process.env.TELEGRAM_CHANNEL || 'eeuethiopia').replace(/^@/, '').trim()];
+    }
     this.intervalMs = config.intervalMs || 60000; // default 1 minute
   }
 
   public start() {
     if (this.isRunning) return;
     this.isRunning = true;
-    console.log(`[TelegramPoller] Started polling @${this.channelUsername} every ${this.intervalMs / 1000}s`);
+    console.log(`[TelegramPoller] Started polling channels [${this.channels.map((c) => '@' + c).join(', ')}] every ${this.intervalMs / 1000}s`);
 
     // Run first check immediately
-    this.pollChannel().catch((err) => console.error('[TelegramPoller] Initial poll error:', err));
+    this.pollAllChannels().catch((err) => console.error('[TelegramPoller] Initial poll error:', err));
 
     this.timer = setInterval(() => {
-      this.pollChannel().catch((err) => console.error('[TelegramPoller] Poll error:', err));
+      this.pollAllChannels().catch((err) => console.error('[TelegramPoller] Poll error:', err));
     }, this.intervalMs);
   }
 
@@ -45,8 +54,16 @@ export class TelegramPoller {
     console.log('[TelegramPoller] Polling stopped.');
   }
 
-  public async pollChannel(): Promise<number> {
-    const url = `https://t.me/s/${this.channelUsername}`;
+  public async pollAllChannels(): Promise<number> {
+    let total = 0;
+    for (const channel of this.channels) {
+      total += await this.pollChannel(channel);
+    }
+    return total;
+  }
+
+  public async pollChannel(channelUsername: string = this.channels[0]): Promise<number> {
+    const url = `https://t.me/s/${channelUsername}`;
     try {
       const resp = await fetch(url, {
         headers: {
@@ -60,7 +77,7 @@ export class TelegramPoller {
       }
 
       const html = await resp.text();
-      const messages = this.parseHtmlMessages(html);
+      const messages = this.parseHtmlMessages(html, channelUsername);
       let newCount = 0;
 
       for (const msg of messages) {
@@ -76,7 +93,7 @@ export class TelegramPoller {
 
       return newCount;
     } catch (err: any) {
-      console.error(`[TelegramPoller] Failed to fetch channel: ${err.message}`);
+      console.error(`[TelegramPoller] Failed to fetch channel @${channelUsername}: ${err.message}`);
       return 0;
     }
   }
@@ -85,7 +102,7 @@ export class TelegramPoller {
    * Extracts messages from Telegram's web preview HTML with strict per-message wrap isolation.
    * Guarantees that photo-only messages without text do not bleed their post IDs onto subsequent text messages.
    */
-  private parseHtmlMessages(html: string): TelegramRawMessage[] {
+  private parseHtmlMessages(html: string, channelUsername: string = this.channels[0]): TelegramRawMessage[] {
     const messages: TelegramRawMessage[] = [];
     const rawWraps = html.split('<div class="tgme_widget_message_wrap');
 
@@ -99,25 +116,27 @@ export class TelegramPoller {
 
       // Match text strictly within this message wrap
       const textMatch = wrap.match(/<div class="tgme_widget_message_text[^"]*"[^>]*>([\s\S]*?)<\/div>/);
-      if (!textMatch) {
-        // Wrap has no text content (e.g. standalone picture, video preview, or graphic banner)
-        // DO NOT attach text from another message!
-        continue;
-      }
+      const rawHtmlText = textMatch ? textMatch[1] : '';
 
       // Match datetime strictly within this message wrap
       const timeMatch = wrap.match(/<time datetime="([^"]+)"/);
       const publishedAt = timeMatch ? timeMatch[1] : new Date().toISOString();
 
-      // Check for attached media image URLs
+      // Check for attached media image URLs (both background-image and img tags)
       const mediaUrls: string[] = [];
-      const photoMatch = wrap.match(/background-image:\s*url\('([^']+)'\)/);
+      const photoMatch = wrap.match(/background-image:\s*url\('([^']+)'\)/i);
       if (photoMatch && !photoMatch[1].includes('emoji')) {
         mediaUrls.push(photoMatch[1]);
       }
+      const imgMatches = wrap.matchAll(/<img[^>]+src="([^">]+)"/gi);
+      for (const m of imgMatches) {
+        if (!m[1].includes('emoji') && !m[1].includes('avatar') && !mediaUrls.includes(m[1])) {
+          mediaUrls.push(m[1]);
+        }
+      }
 
       // Strip HTML tags and entities
-      const cleanText = textMatch[1]
+      const cleanText = rawHtmlText
         .replace(/<br\s*\/?>/gi, '\n')
         .replace(/<[^>]+>/g, '')
         .replace(/&nbsp;/gi, ' ')
@@ -131,12 +150,14 @@ export class TelegramPoller {
 
       const postId = rawPostId.split('/')[1] || rawPostId;
 
-      if (cleanText.length > 20) {
+      // Keep if message has substantive text OR contains an attached flyer/media
+      if (cleanText.length > 20 || mediaUrls.length > 0) {
         messages.push({
           id: postId,
-          channel_id: this.channelUsername,
+          channel_id: channelUsername,
           published_at: publishedAt,
-          raw_text: cleanText,
+          raw_text: cleanText || '[Official Schedule Flyer Graphic]',
+          caption: cleanText || undefined,
           media_urls: mediaUrls,
           raw_payload: {
             rawPostId,
