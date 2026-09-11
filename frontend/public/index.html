@@ -40,12 +40,12 @@
             "background": "#0a0a0b"
           },
           fontFamily: {
-            "sans": ["Inter", "Noto Sans Ethiopic", "sans-serif"],
+            "sans": ["IBM Plex Sans", "Noto Sans Ethiopic", "sans-serif"],
             "mono": ["JetBrains Mono", "monospace"],
             "data-display": ["JetBrains Mono", "monospace"],
-            "headline-md": ["Inter", "sans-serif"],
-            "headline-lg": ["Inter", "sans-serif"],
-            "body-md": ["Inter", "sans-serif"],
+            "headline-md": ["Plus Jakarta Sans", "sans-serif"],
+            "headline-lg": ["Plus Jakarta Sans", "sans-serif"],
+            "body-md": ["IBM Plex Sans", "Noto Sans Ethiopic", "sans-serif"],
             "code-sm": ["JetBrains Mono", "monospace"]
           }
         }
@@ -56,7 +56,7 @@
   <!-- Google Fonts & Material Symbols -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
 
   <!-- Leaflet CSS & JS -->
@@ -98,7 +98,7 @@
       <div class="relative hidden lg:block w-72">
         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
         <input id="searchInput" type="text"
-          class="bg-[#0e1416] border border-outline-variant/60 rounded-full py-1.5 pl-10 pr-8 text-xs sm:text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary/50 focus:outline-none transition-all w-full placeholder:text-on-surface-variant/50 font-sans"
+          class="bg-[#0e1416] border border-outline-variant/60 rounded-full py-2 pl-10 pr-8 text-xs sm:text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary/50 focus:outline-none transition-all w-full placeholder:text-on-surface-variant/50 font-sans min-h-[44px]"
           placeholder="Search subcity, woreda, landmark... [/]" />
         <kbd class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono px-1 py-0.5 bg-surface-container rounded border border-outline-variant/40 text-on-surface-variant">/</kbd>
         <div id="searchResults" class="absolute left-0 right-0 top-full mt-2 glass-panel rounded-xl shadow-2xl z-50 hidden overflow-hidden max-h-72 overflow-y-auto"></div>
@@ -116,20 +116,20 @@
         </div>
       </div>
 
-      <!-- Report Outage Button -->
-      <button id="openReportBtn" class="bg-primary text-[#000000] text-xs sm:text-sm font-bold px-3.5 sm:px-4 py-1.5 rounded-full hover:bg-primary-fixed active:scale-95 duration-150 transition-all shadow-[0_0_15px_-3px_rgba(76,215,246,0.4)] flex items-center gap-1.5">
+      <!-- Report Outage Button (44px min touch target) -->
+      <button id="openReportBtn" class="bg-primary text-[#000000] text-xs sm:text-sm font-bold px-4 py-2 min-h-[44px] rounded-full hover:bg-primary-fixed active:scale-95 duration-150 transition-all shadow-[0_0_15px_-3px_rgba(76,215,246,0.4)] flex items-center gap-1.5">
         <span class="material-symbols-outlined text-sm sm:text-base">add_alert</span>
         <span data-i18n="btn_report">Report Outage</span>
       </button>
 
-      <!-- Language Toggle -->
-      <button id="langToggle" class="text-on-surface-variant border border-outline-variant/60 px-2.5 py-1 rounded-lg text-xs font-mono hover:text-primary hover:border-primary transition-colors flex items-center gap-1">
+      <!-- Language Toggle (44px min touch target) -->
+      <button id="langToggle" class="text-on-surface-variant border border-outline-variant/60 px-3 py-2 min-h-[44px] rounded-lg text-xs font-mono hover:text-primary hover:border-primary transition-colors flex items-center gap-1.5">
         <span class="material-symbols-outlined text-sm">translate</span>
         <span id="langLabel">አማርኛ</span>
       </button>
 
-      <!-- Mobile Menu Toggle Button -->
-      <button id="mobileMenuBtn" class="md:hidden text-on-surface-variant hover:text-primary p-1.5 rounded-lg hover:bg-surface-container transition-colors">
+      <!-- Mobile Menu Toggle Button (44px touch target) -->
+      <button id="mobileMenuBtn" class="md:hidden text-on-surface-variant hover:text-primary min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-surface-container transition-colors">
         <span class="material-symbols-outlined">menu</span>
       </button>
 
@@ -160,19 +160,19 @@
 
     <!-- Navigation Menu Items -->
     <nav class="flex-1 py-4 flex flex-col gap-1 overflow-y-auto px-2">
-      <a href="#grid-overview" class="side-nav-link active bg-primary-container text-on-primary-container font-bold rounded-lg flex items-center gap-3 px-4 py-2.5 font-body-md text-sm transition-all shadow-[0_0_15px_-5px_rgba(6,182,212,0.3)] border border-primary/20" data-view="grid-overview">
+      <a href="#grid-overview" class="side-nav-link active bg-primary-container text-on-primary-container font-bold rounded-lg flex items-center gap-3 px-4 py-2.5 min-h-[44px] font-body-md text-sm transition-all shadow-[0_0_15px_-5px_rgba(6,182,212,0.3)] border border-primary/20" data-view="grid-overview">
         <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">grid_view</span>
         <span>Grid Overview</span>
       </a>
-      <a href="#woreda-details" class="side-nav-link text-on-surface-variant hover:bg-surface-container-high rounded-lg flex items-center gap-3 px-4 py-2.5 font-body-md text-sm transition-all hover:text-primary" data-view="woreda-details">
+      <a href="#woreda-details" class="side-nav-link text-on-surface-variant hover:bg-surface-container-high rounded-lg flex items-center gap-3 px-4 py-2.5 min-h-[44px] font-body-md text-sm transition-all hover:text-primary" data-view="woreda-details">
         <span class="material-symbols-outlined text-[20px]">location_city</span>
         <span>Woreda Details</span>
       </a>
-      <a href="#maintenance" class="side-nav-link text-on-surface-variant hover:bg-surface-container-high rounded-lg flex items-center gap-3 px-4 py-2.5 font-body-md text-sm transition-all hover:text-primary" data-view="maintenance">
+      <a href="#maintenance" class="side-nav-link text-on-surface-variant hover:bg-surface-container-high rounded-lg flex items-center gap-3 px-4 py-2.5 min-h-[44px] font-body-md text-sm transition-all hover:text-primary" data-view="maintenance">
         <span class="material-symbols-outlined text-[20px]">engineering</span>
         <span>Maintenance</span>
       </a>
-      <a href="#citizen-reports" class="side-nav-link text-on-surface-variant hover:bg-surface-container-high rounded-lg flex items-center gap-3 px-4 py-2.5 font-body-md text-sm transition-all hover:text-primary" data-view="citizen-reports">
+      <a href="#citizen-reports" class="side-nav-link text-on-surface-variant hover:bg-surface-container-high rounded-lg flex items-center gap-3 px-4 py-2.5 min-h-[44px] font-body-md text-sm transition-all hover:text-primary" data-view="citizen-reports">
         <span class="material-symbols-outlined text-[20px]">campaign</span>
         <span>Citizen Reports</span>
       </a>
@@ -180,11 +180,11 @@
 
     <!-- Sidebar Footer -->
     <div class="p-4 border-t border-outline-variant/20 flex flex-col gap-1.5">
-      <a href="https://t.me/ethiopianelectricutility" target="_blank" rel="noopener noreferrer" class="text-on-surface-variant hover:text-primary px-3 py-1.5 flex items-center gap-2.5 font-mono text-xs transition-colors rounded-lg hover:bg-surface-container">
+      <a href="https://t.me/ethiopianelectricutility" target="_blank" rel="noopener noreferrer" class="text-on-surface-variant hover:text-primary px-3 py-2 min-h-[44px] flex items-center gap-2.5 font-mono text-xs transition-colors rounded-lg hover:bg-surface-container">
         <span class="material-symbols-outlined text-sm">send</span>
         <span>EEU Channel ↗</span>
       </a>
-      <button id="adminDrawerBtn" class="text-on-surface-variant hover:text-primary px-3 py-1.5 flex items-center gap-2.5 font-mono text-xs transition-colors rounded-lg hover:bg-surface-container text-left w-full">
+      <button id="adminDrawerBtn" class="text-on-surface-variant hover:text-primary px-3 py-2 min-h-[44px] flex items-center gap-2.5 font-mono text-xs transition-colors rounded-lg hover:bg-surface-container text-left w-full">
         <span class="material-symbols-outlined text-sm">terminal</span>
         <span>Ingestion Audit</span>
       </button>
@@ -381,12 +381,12 @@
 
           <!-- Quick Filters -->
           <div class="flex flex-wrap items-center gap-2">
-            <button class="region-filter-btn px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-surface-container text-primary border border-primary/30 transition-all" data-filter="all">All Subcities</button>
-            <button class="region-filter-btn px-3 py-1.5 rounded-lg text-xs font-mono text-on-surface-variant hover:text-white bg-surface-container-low border border-outline-variant/40 transition-all" data-filter="Bole">Bole</button>
-            <button class="region-filter-btn px-3 py-1.5 rounded-lg text-xs font-mono text-on-surface-variant hover:text-white bg-surface-container-low border border-outline-variant/40 transition-all" data-filter="Yeka">Yeka</button>
-            <button class="region-filter-btn px-3 py-1.5 rounded-lg text-xs font-mono text-on-surface-variant hover:text-white bg-surface-container-low border border-outline-variant/40 transition-all" data-filter="Kirkos">Kirkos</button>
-            <button class="region-filter-btn px-3 py-1.5 rounded-lg text-xs font-mono text-on-surface-variant hover:text-white bg-surface-container-low border border-outline-variant/40 transition-all" data-filter="Arada">Arada</button>
-            <button class="region-filter-btn px-3 py-1.5 rounded-lg text-xs font-mono text-on-surface-variant hover:text-white bg-surface-container-low border border-outline-variant/40 transition-all" data-filter="Lideta">Lideta</button>
+            <button class="region-filter-btn px-3.5 py-2 min-h-[44px] flex items-center justify-center rounded-lg text-xs font-mono font-semibold bg-surface-container text-primary border border-primary/30 transition-all" data-filter="all">All Subcities</button>
+            <button class="region-filter-btn px-3.5 py-2 min-h-[44px] flex items-center justify-center rounded-lg text-xs font-mono text-on-surface-variant hover:text-white bg-surface-container-low border border-outline-variant/40 transition-all" data-filter="Bole">Bole</button>
+            <button class="region-filter-btn px-3.5 py-2 min-h-[44px] flex items-center justify-center rounded-lg text-xs font-mono text-on-surface-variant hover:text-white bg-surface-container-low border border-outline-variant/40 transition-all" data-filter="Yeka">Yeka</button>
+            <button class="region-filter-btn px-3.5 py-2 min-h-[44px] flex items-center justify-center rounded-lg text-xs font-mono text-on-surface-variant hover:text-white bg-surface-container-low border border-outline-variant/40 transition-all" data-filter="Kirkos">Kirkos</button>
+            <button class="region-filter-btn px-3.5 py-2 min-h-[44px] flex items-center justify-center rounded-lg text-xs font-mono text-on-surface-variant hover:text-white bg-surface-container-low border border-outline-variant/40 transition-all" data-filter="Arada">Arada</button>
+            <button class="region-filter-btn px-3.5 py-2 min-h-[44px] flex items-center justify-center rounded-lg text-xs font-mono text-on-surface-variant hover:text-white bg-surface-container-low border border-outline-variant/40 transition-all" data-filter="Lideta">Lideta</button>
           </div>
         </header>
 
@@ -478,7 +478,7 @@
             <p class="text-[11px] font-mono text-on-surface-variant">Addis Ababa Citizen Intelligence</p>
           </div>
         </div>
-        <button id="closeReportBtn" class="text-on-surface-variant hover:text-white p-1 rounded-lg hover:bg-surface-container transition-colors">
+        <button id="closeReportBtn" class="text-on-surface-variant hover:text-white min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-surface-container transition-colors">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
@@ -490,11 +490,11 @@
         <div>
           <label class="block text-xs font-mono uppercase tracking-wider text-on-surface-variant mb-2">Outage Status</label>
           <div class="grid grid-cols-2 gap-3">
-            <label class="flex items-center justify-center gap-2 p-3 rounded-lg border border-rose-500/40 bg-rose-500/10 cursor-pointer hover:bg-rose-500/20 transition text-rose-300 font-semibold text-xs">
+            <label class="flex items-center justify-center gap-2 p-3 min-h-[44px] rounded-lg border border-rose-500/40 bg-rose-500/10 cursor-pointer hover:bg-rose-500/20 transition text-rose-300 font-semibold text-xs">
               <input type="radio" name="report_type" value="POWER_OUT" checked class="text-rose-500 focus:ring-rose-500 bg-surface">
               <span data-i18n="report_type_out">Power is OUT</span>
             </label>
-            <label class="flex items-center justify-center gap-2 p-3 rounded-lg border border-emerald-500/40 bg-emerald-500/10 cursor-pointer hover:bg-emerald-500/20 transition text-emerald-300 font-semibold text-xs">
+            <label class="flex items-center justify-center gap-2 p-3 min-h-[44px] rounded-lg border border-emerald-500/40 bg-emerald-500/10 cursor-pointer hover:bg-emerald-500/20 transition text-emerald-300 font-semibold text-xs">
               <input type="radio" name="report_type" value="POWER_RESTORED" class="text-emerald-500 focus:ring-emerald-500 bg-surface">
               <span data-i18n="report_type_restored">Power RESTORED</span>
             </label>
@@ -504,7 +504,7 @@
         <!-- Woreda Selector -->
         <div>
           <label class="block text-xs font-mono uppercase tracking-wider text-on-surface-variant mb-1.5" data-i18n="woreda_label">Select Woreda</label>
-          <select id="reportWoredaSelect" required class="w-full bg-surface-container border border-outline-variant/60 rounded-lg p-2.5 text-sm text-on-surface focus:outline-none focus:border-primary">
+          <select id="reportWoredaSelect" required class="w-full bg-surface-container border border-outline-variant/60 rounded-lg p-2.5 min-h-[44px] text-sm text-on-surface focus:outline-none focus:border-primary">
             <option value="">Select your Woreda...</option>
           </select>
         </div>
@@ -515,7 +515,7 @@
             <span class="material-symbols-outlined text-primary text-base">my_location</span>
             <span>Use GPS for accurate woreda resolution</span>
           </div>
-          <button type="button" id="gpsLocateBtn" class="text-xs font-mono text-primary hover:underline flex items-center gap-1">
+          <button type="button" id="gpsLocateBtn" class="text-xs font-mono text-primary hover:underline flex items-center gap-1 min-h-[44px] py-1">
             <span data-i18n="btn_locate_me">Detect Location</span>
           </button>
         </div>
@@ -530,10 +530,10 @@
 
       <!-- Modal Footer -->
       <div class="p-4 border-t border-outline-variant/30 bg-surface-container/60 flex justify-between items-center">
-        <button type="button" id="cancelReportBtn" class="px-4 py-2 border border-outline-variant/50 rounded-lg text-xs font-mono text-on-surface-variant hover:bg-surface-container hover:text-white transition">
+        <button type="button" id="cancelReportBtn" class="px-4 py-2 min-h-[44px] border border-outline-variant/50 rounded-lg text-xs font-mono text-on-surface-variant hover:bg-surface-container hover:text-white transition">
           Cancel
         </button>
-        <button type="submit" form="outageReportForm" class="px-6 py-2 bg-primary text-[#000000] font-bold rounded-lg text-xs font-mono hover:bg-primary-fixed active:scale-95 transition flex items-center gap-1.5 shadow-[0_0_15px_rgba(76,215,246,0.4)]">
+        <button type="submit" form="outageReportForm" class="px-6 py-2 min-h-[44px] bg-primary text-[#000000] font-bold rounded-lg text-xs font-mono hover:bg-primary-fixed active:scale-95 transition flex items-center gap-1.5 shadow-[0_0_15px_rgba(76,215,246,0.4)]">
           <span data-i18n="btn_submit_report">Submit Report</span>
           <span class="material-symbols-outlined text-sm">arrow_forward</span>
         </button>
@@ -561,7 +561,7 @@
         </div>
         <div class="flex items-center gap-2">
           <span id="modalStatusBadge" class="px-3 py-1 rounded-full text-xs font-mono font-semibold">Normal</span>
-          <button id="closeDetailModalBtn" class="text-on-surface-variant hover:text-white p-1 rounded-lg hover:bg-surface-container transition-colors">
+          <button id="closeDetailModalBtn" class="text-on-surface-variant hover:text-white min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-surface-container transition-colors" aria-label="Close modal">
             <span class="material-symbols-outlined">close</span>
           </button>
         </div>
@@ -603,11 +603,12 @@
         <div id="modalQuoteBox" class="hidden rounded-xl bg-[#0e0e10] border border-outline-variant/40 p-4 space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-[#ffb873] flex items-center gap-1.5 font-mono">
-              <span>🎯</span>
+              <span class="material-symbols-outlined text-sm text-[#ffb873]">my_location</span>
               <span data-i18n="quoted_specific_point">Quoted Point in Announcement</span>
             </span>
-            <button id="modalCopySearchBtn" type="button" class="hidden text-[11px] font-mono px-2.5 py-1 rounded-lg bg-cyan-950 hover:bg-cyan-900 text-[#4cd7f6] border border-cyan-500/40 transition">
-              <span id="modalCopySearchLabel">📋 Copy Keyword</span>
+            <button id="modalCopySearchBtn" type="button" class="hidden min-h-[44px] text-[11px] font-mono px-3 py-1.5 rounded-lg bg-cyan-950 hover:bg-cyan-900 text-[#4cd7f6] border border-cyan-500/40 transition inline-flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-xs">content_copy</span>
+              <span id="modalCopySearchLabel">Copy Keyword</span>
             </button>
           </div>
           
@@ -618,7 +619,7 @@
 
           <!-- Collapsible full announcement -->
           <details id="modalFullTextDetails" class="hidden group text-[11px] text-[#869397]">
-            <summary class="cursor-pointer select-none text-slate-400 hover:text-slate-300 font-mono font-medium">
+            <summary class="cursor-pointer select-none text-slate-400 hover:text-slate-300 font-mono font-medium min-h-[36px] flex items-center">
               <span data-i18n="view_full_announcement">View Full Post Text</span> ▾
             </summary>
             <blockquote id="modalQuoteText" class="mt-1.5 text-[11px] text-slate-300 border-l border-white/10 pl-2.5 py-1 font-mono whitespace-pre-line max-h-32 overflow-y-auto leading-relaxed bg-[#161618] rounded-r">
@@ -626,10 +627,10 @@
           </details>
 
           <div class="flex items-center justify-between pt-2 border-t border-outline-variant/30 text-xs font-mono">
-            <a id="modalSourceLink" href="#" target="_blank" rel="noopener noreferrer" class="text-[#4cd7f6] hover:underline font-semibold flex items-center gap-1">
+            <a id="modalSourceLink" href="#" target="_blank" rel="noopener noreferrer" class="text-[#4cd7f6] hover:underline font-semibold flex items-center gap-1 min-h-[44px] py-1">
               <span>Open in Telegram ↗</span>
             </a>
-            <button id="modalToggleEmbedBtn" type="button" class="text-[11px] px-2.5 py-1 rounded-lg bg-[#1f1f21] hover:bg-[#2a2a2c] text-[#ffb873] border border-white/10 transition">
+            <button id="modalToggleEmbedBtn" type="button" class="text-[11px] px-3 py-1.5 min-h-[44px] rounded-lg bg-[#1f1f21] hover:bg-[#2a2a2c] text-[#ffb873] border border-white/10 transition inline-flex items-center">
               <span id="modalToggleEmbedLabel">Show Embed ▾</span>
             </button>
           </div>
@@ -640,7 +641,7 @@
         </div>
 
         <div id="modalSourceLinkBox" class="hidden pt-1">
-          <a id="modalSourceLinkFallback" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-xs font-mono text-[#4cd7f6] hover:underline">
+          <a id="modalSourceLinkFallback" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-xs font-mono text-[#4cd7f6] hover:underline min-h-[44px]">
             <span>Open Telegram Announcement ↗</span>
           </a>
         </div>
@@ -655,11 +656,11 @@
 
       <!-- Modal Footer -->
       <div class="p-4 border-t border-outline-variant/30 bg-surface-container/60 flex justify-between items-center">
-        <button id="modalReportBtn" type="button" class="px-4 py-2 bg-primary/20 hover:bg-primary/30 border border-primary/40 rounded-lg text-xs font-mono font-semibold text-primary transition flex items-center gap-1.5">
+        <button id="modalReportBtn" type="button" class="px-4 py-2.5 min-h-[44px] bg-primary/20 hover:bg-primary/30 border border-primary/40 rounded-lg text-xs font-mono font-semibold text-primary transition flex items-center gap-1.5">
           <span class="material-symbols-outlined text-sm">bolt</span>
           <span>Report for this Woreda</span>
         </button>
-        <button id="closeDetailModalBtn2" type="button" class="px-5 py-2 bg-surface-container-high border border-outline-variant/50 rounded-lg text-xs font-mono text-on-surface hover:text-white transition">
+        <button id="closeDetailModalBtn2" type="button" class="px-5 py-2.5 min-h-[44px] bg-surface-container-high border border-outline-variant/50 rounded-lg text-xs font-mono text-on-surface hover:text-white transition">
           Close
         </button>
       </div>

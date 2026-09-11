@@ -295,7 +295,7 @@ function initLanguage() {
   if (langBtn) {
     langBtn.addEventListener('click', () => {
       currentLang = currentLang === 'en' ? 'am' : 'en';
-      langBtn.innerHTML = `<span>🌐</span><span>${currentLang === 'en' ? 'አማርኛ' : 'English'}</span>`;
+      langBtn.innerHTML = `<span class="material-symbols-outlined text-sm">translate</span><span>${currentLang === 'en' ? 'አማርኛ' : 'English'}</span>`;
       applyTranslations();
       updateMapLabels();
       renderOutagesList();
@@ -535,9 +535,9 @@ function initMap() {
   ]);
 
   const baseMaps = {
-    '🌙 Dark Canvas': darkLayerGroup,
-    '🗺️ Street View': osmLayer,
-    '🛰️ Satellite': satelliteLayer,
+    'Dark Canvas': darkLayerGroup,
+    'Street View': osmLayer,
+    'Satellite': satelliteLayer,
   };
 
   L.control.layers(baseMaps, null, { position: 'topright' }).addTo(mapInstance);
@@ -863,17 +863,17 @@ function openWoredaDetailModal(properties, statusInfo) {
       ? (currentLang === 'am' ? statusInfo.ethiopian_date.split('(')[0].trim() : statusInfo.ethiopian_date)
       : (currentLang === 'am' ? ethDate.formattedAm : ethDate.formattedEn);
 
-    document.getElementById('modalDateEth').textContent = `📅 ${displayEthDate}`;
+    document.getElementById('modalDateEth').innerHTML = `<span class="material-symbols-outlined text-xs text-[#ffb873] mr-1 align-text-bottom">calendar_today</span>${escapeHtml(displayEthDate)}`;
     document.getElementById('modalDateGreg').textContent = `Gregorian: ${gregDate}`;
     dateBox.classList.remove('hidden');
 
     if (statusInfo.scheduled_end) {
       const sEth = formatEthiopianTime(statusInfo.scheduled_start);
       const eEth = formatEthiopianTime(statusInfo.scheduled_end);
-      document.getElementById('modalTimeEth').textContent =
+      document.getElementById('modalTimeEth').innerHTML =
         currentLang === 'am'
-          ? `🕒 ${sEth.am} – ${eEth.am}`
-          : `🕒 ${sEth.en} – ${eEth.en}`;
+          ? `<span class="material-symbols-outlined text-xs text-white/80 mr-1 align-text-bottom">schedule</span>${escapeHtml(sEth.am)} – ${escapeHtml(eEth.am)}`
+          : `<span class="material-symbols-outlined text-xs text-white/80 mr-1 align-text-bottom">schedule</span>${escapeHtml(sEth.en)} – ${escapeHtml(eEth.en)}`;
       document.getElementById('modalTimeCivil').textContent = `24h Civil Time: ${sEth.civil} – ${eEth.civil}`;
       timeBox.classList.remove('hidden');
     }
@@ -893,10 +893,13 @@ function openWoredaDetailModal(properties, statusInfo) {
           const displayName = currentLang === 'am' ? (lm.name_am || lm.name_en) : (lm.name_en || lm.name_am);
           return `
             <button type="button" onclick="zoomToLandmark(${lm.lat}, ${lm.lng}, '${escapeHtml(displayName)}')"
-              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-medium transition cursor-pointer shadow-sm">
-              <span>📍</span>
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-medium transition cursor-pointer shadow-sm">
+              <span class="material-symbols-outlined text-xs">location_on</span>
               <span>${escapeHtml(displayName)}</span>
-              <span class="text-[10px] text-amber-400/80 bg-amber-500/20 px-1 rounded">🎯 ${t('zoom_landmark_btn')}</span>
+              <span class="text-[10px] text-amber-400/80 bg-amber-500/20 px-1.5 py-0.5 rounded flex items-center gap-1">
+                <span class="material-symbols-outlined text-[11px]">my_location</span>
+                <span>${t('zoom_landmark_btn')}</span>
+              </span>
             </button>
           `;
         })
@@ -970,7 +973,7 @@ function openWoredaDetailModal(properties, statusInfo) {
 
       // Copy Search Keyword helper
       if (targetQuote && targetQuote.keyword && copySearchBtn && copySearchLabel) {
-        copySearchLabel.textContent = `📋 Copy "${targetQuote.keyword}"`;
+        copySearchLabel.textContent = `Copy "${targetQuote.keyword}"`;
         copySearchBtn.classList.remove('hidden');
         copySearchBtn.onclick = (e) => {
           e.preventDefault();
@@ -1132,7 +1135,7 @@ window.copyToClipboard = function (text, btn) {
   if (!text) return;
   navigator.clipboard.writeText(text).then(() => {
     const originalText = btn.innerHTML;
-    btn.innerHTML = `✅ Copied "${escapeHtml(text)}"`;
+    btn.innerHTML = `<span class="material-symbols-outlined text-xs mr-1 align-text-bottom">check</span>Copied "${escapeHtml(text)}"`;
     btn.classList.remove('bg-sky-950', 'text-sky-300', 'border-sky-700/70', 'bg-slate-800', 'text-amber-400', 'border-slate-700');
     btn.classList.add('bg-emerald-900', 'text-emerald-300', 'border-emerald-600');
     setTimeout(() => {
@@ -1226,18 +1229,19 @@ function renderQuotedAnnouncementSection(rawText, sourceUrl, uniqueId, searchKey
     targetQuote && targetQuote.keyword
       ? `<button type="button" onclick="copyToClipboard('${escapeHtml(
           targetQuote.keyword
-        )}', this)" class="text-[11px] px-2.5 py-1 rounded-lg bg-cyan-950/80 hover:bg-cyan-900 text-[#4cd7f6] border border-cyan-500/40 transition font-medium shadow-sm">
-           📋 Copy "${escapeHtml(targetQuote.keyword)}"
+        )}', this)" class="text-[11px] px-2.5 py-1 min-h-[36px] rounded-lg bg-cyan-950/80 hover:bg-cyan-900 text-[#4cd7f6] border border-cyan-500/40 transition font-medium shadow-sm inline-flex items-center gap-1.5">
+           <span class="material-symbols-outlined text-xs">content_copy</span>
+           <span>Copy "${escapeHtml(targetQuote.keyword)}"</span>
          </button>`
       : '';
 
   const embedControls = sourceUrl
     ? `
       <div class="mt-2.5 pt-2 border-t border-white/[0.08] flex items-center justify-between text-xs">
-        <a href="${directLink}" target="_blank" rel="noopener noreferrer" class="text-[#4cd7f6] hover:underline font-semibold flex items-center gap-1">
+        <a href="${directLink}" target="_blank" rel="noopener noreferrer" class="text-[#4cd7f6] hover:underline font-semibold flex items-center gap-1 min-h-[36px]">
           <span>Open in Telegram ↗</span>
         </a>
-        <button id="${btnId}" type="button" onclick="toggleEmbedIframe('${embedId}', '${sourceUrl}', '${btnId}')" class="px-2.5 py-1 rounded-lg bg-[#1f1f21] hover:bg-[#2a2a2c] text-[#ffb873] border border-white/10 font-medium transition">
+        <button id="${btnId}" type="button" onclick="toggleEmbedIframe('${embedId}', '${sourceUrl}', '${btnId}')" class="px-2.5 py-1 min-h-[36px] rounded-lg bg-[#1f1f21] hover:bg-[#2a2a2c] text-[#ffb873] border border-white/10 font-medium transition inline-flex items-center">
           ${t('show_embed')}
         </button>
       </div>
@@ -1253,7 +1257,7 @@ function renderQuotedAnnouncementSection(rawText, sourceUrl, uniqueId, searchKey
     <div class="mt-3 bg-[#0e0e10] border border-white/[0.08] rounded-xl p-3.5 space-y-2.5">
       <div class="flex items-center justify-between">
         <span class="text-xs font-bold text-[#ffb873] flex items-center gap-1.5">
-          <span>🎯</span>
+          <span class="material-symbols-outlined text-xs text-[#ffb873]">my_location</span>
           <span>${t('quoted_specific_point')}</span>
         </span>
         ${copyKeywordBtn}
@@ -1327,7 +1331,7 @@ function renderLandmarkPins() {
 
     // Tooltip on hover
     marker.bindTooltip(
-      `<div class="font-bold text-xs text-[#4cd7f6]">📍 ${escapeHtml(name)}</div>
+      `<div class="font-bold text-xs text-[#4cd7f6] flex items-center gap-1"><span class="material-symbols-outlined text-xs">location_on</span><span>${escapeHtml(name)}</span></div>
        <div class="text-[11px] text-slate-300">${escapeHtml(subcityName)} • Woreda ${escapeHtml(woredaNum)}</div>`,
       { direction: 'top', offset: [0, -10], className: 'leaflet-dark-tooltip' }
     );
@@ -1347,7 +1351,7 @@ function renderLandmarkPins() {
         <div class="flex items-start justify-between border-b border-white/10 pb-1.5">
           <div>
             <div class="text-xs font-bold text-[#4cd7f6] flex items-center gap-1">
-              <span>📍</span>
+              <span class="material-symbols-outlined text-xs">location_on</span>
               <span>${escapeHtml(name)}</span>
             </div>
             <div class="text-[11px] font-mono text-[#869397]">${escapeHtml(subcityName)} • Woreda ${escapeHtml(woredaNum)}</div>
@@ -1360,7 +1364,7 @@ function renderLandmarkPins() {
         ${
           timeDisplay
             ? `<div class="text-[11px] font-mono text-slate-300">
-                <span class="text-[#869397]">🕒 ${t('time_label')}:</span> <span class="font-semibold text-white">${escapeHtml(timeDisplay)}</span>
+                <span class="text-[#869397] inline-flex items-center gap-0.5"><span class="material-symbols-outlined text-xs">schedule</span><span>${t('time_label')}:</span></span> <span class="font-semibold text-white">${escapeHtml(timeDisplay)}</span>
                </div>`
             : ''
         }
@@ -1483,8 +1487,8 @@ function renderOutagesList() {
         : '';
 
       const statusBadge = isHistory
-        ? `<span class="px-2.5 py-1 text-xs font-mono font-semibold rounded-full bg-emerald-950/70 text-emerald-300 border border-emerald-700/60 shadow-sm">
-             ✅ ${t('status_concluded')}
+        ? `<span class="px-2.5 py-1 text-xs font-mono font-semibold rounded-full bg-emerald-950/70 text-emerald-300 border border-emerald-700/60 shadow-sm inline-flex items-center gap-1">
+             <span class="material-symbols-outlined text-xs">check_circle</span><span>${t('status_concluded')}</span>
            </span>`
         : `<span class="px-2.5 py-1 text-xs font-mono font-semibold rounded-full ${
             isScheduled
@@ -1514,11 +1518,17 @@ function renderOutagesList() {
 
         <div class="mb-3 px-3.5 py-2.5 rounded-xl bg-[#0e0e10] border border-white/[0.08] flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
           <div class="flex items-center gap-2">
-            <span class="text-[#ffb873] font-bold">📅 ${ethDateLabel}</span>
+            <span class="text-[#ffb873] font-bold flex items-center gap-1">
+              <span class="material-symbols-outlined text-xs text-[#ffb873]">calendar_today</span>
+              <span>${ethDateLabel}</span>
+            </span>
             <span class="text-[#869397]">(${gregDateStr})</span>
           </div>
           <div class="flex items-center gap-2 text-slate-300">
-            <span class="text-white font-semibold">🕒 ${isHistory ? 'Concluded: ' : ''}${ethTimeDisplay || 'TBD'}</span>
+            <span class="text-white font-semibold flex items-center gap-1">
+              <span class="material-symbols-outlined text-xs text-white/80">schedule</span>
+              <span>${isHistory ? 'Concluded: ' : ''}${ethTimeDisplay || 'TBD'}</span>
+            </span>
             <span class="text-[#869397] text-[11px]">(${civilTimeDisplay})</span>
           </div>
         </div>
@@ -1526,18 +1536,21 @@ function renderOutagesList() {
         <div class="font-bold text-base text-white mb-1 tracking-tight">${displayLocation}</div>
         <div class="text-sm text-slate-300 mb-3">${reason || 'Maintenance Work'}</div>
         <div class="text-xs font-mono text-[#869397] flex flex-wrap items-center gap-4">
-          ${areas.length > 0 ? `<span>📍 ${areas.length} Woreda(s) affected</span>` : `<span>📍 Regional Town / Grid Substation</span>`}
-          ${isHistory && o.scheduled_end ? `<span>🏁 Concluded at ${civilTimeDisplay.split('–')[1] || civilTimeDisplay}</span>` : ''}
+          ${areas.length > 0 ? `<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">location_on</span><span>${areas.length} Woreda(s) affected</span></span>` : `<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">location_on</span><span>Regional Town / Grid Substation</span></span>`}
+          ${isHistory && o.scheduled_end ? `<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">flag</span><span>Concluded at ${civilTimeDisplay.split('–')[1] || civilTimeDisplay}</span></span>` : ''}
         </div>
         ${
           Array.isArray(o.landmarks) && o.landmarks.length > 0
             ? `<div class="mt-2.5 flex flex-wrap items-center gap-1.5">
-                <span class="text-[11px] font-semibold text-[#ffb873]">📍 ${t('pinpoint_title')}:</span>
+                <span class="text-[11px] font-semibold text-[#ffb873] flex items-center gap-0.5">
+                  <span class="material-symbols-outlined text-xs">location_on</span>
+                  <span>${t('pinpoint_title')}:</span>
+                </span>
                 ${o.landmarks
                   .map((lm) => {
                     const lmName = currentLang === 'am' ? (lm.name_am || lm.name_en) : (lm.name_en || lm.name_am);
                     return `<button type="button" onclick="zoomToLandmark(${lm.lat}, ${lm.lng}, '${escapeHtml(lmName)}')" class="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/40 text-[#4cd7f6] transition font-medium shadow-sm">
-                      <span>📍</span><span>${escapeHtml(lmName)}</span><span class="text-[10px] text-cyan-300">🎯</span>
+                      <span class="material-symbols-outlined text-xs">location_on</span><span>${escapeHtml(lmName)}</span><span class="material-symbols-outlined text-[11px] text-cyan-300">my_location</span>
                     </button>`;
                   })
                   .join('')}
@@ -1605,12 +1618,18 @@ function renderCalendar() {
             <div class="amsale-card p-5 flex flex-col justify-between shadow-md">
               <div>
                 <div class="flex items-center justify-between mb-1.5 font-mono">
-                  <span class="text-xs font-bold text-[#ffb873] uppercase tracking-wider">📅 ${ethDateLabel}</span>
+                  <span class="text-xs font-bold text-[#ffb873] uppercase tracking-wider flex items-center gap-1">
+                    <span class="material-symbols-outlined text-xs text-[#ffb873]">calendar_today</span>
+                    <span>${ethDateLabel}</span>
+                  </span>
                   <span class="text-[11px] px-2 py-0.5 rounded font-semibold bg-[#1f1f21] text-[#4cd7f6] border border-white/10">${s.region_name || 'Addis Ababa'}</span>
                 </div>
                 <div class="text-xs text-[#869397] font-mono mb-2.5">Gregorian: ${dateStr}</div>
 
-                <div class="text-base font-bold text-white mb-0.5 font-mono">🕒 ${ethTimeDisplay}</div>
+                <div class="text-base font-bold text-white mb-0.5 font-mono flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm text-white/80">schedule</span>
+                  <span>${ethTimeDisplay}</span>
+                </div>
                 <div class="text-xs font-mono text-[#869397] mb-3">24-Hour Civil: ${civilTimeDisplay}</div>
 
                 <div class="text-sm text-slate-200 mb-2 font-medium"><strong>Affected:</strong> ${displayArea}</div>
@@ -1621,12 +1640,15 @@ function renderCalendar() {
               ${
                 Array.isArray(s.landmarks) && s.landmarks.length > 0
                   ? `<div class="mt-2.5 mb-1 flex flex-wrap items-center gap-1.5">
-                      <span class="text-[11px] font-semibold text-[#ffb873]">📍 ${t('pinpoint_title')}:</span>
+                      <span class="text-[11px] font-semibold text-[#ffb873] flex items-center gap-0.5">
+                        <span class="material-symbols-outlined text-xs">location_on</span>
+                        <span>${t('pinpoint_title')}:</span>
+                      </span>
                       ${s.landmarks
                         .map((lm) => {
                           const lmName = currentLang === 'am' ? (lm.name_am || lm.name_en) : (lm.name_en || lm.name_am);
                           return `<button type="button" onclick="zoomToLandmark(${lm.lat}, ${lm.lng}, '${escapeHtml(lmName)}')" class="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/40 text-[#4cd7f6] transition font-medium shadow-sm">
-                            <span>📍</span><span>${escapeHtml(lmName)}</span><span class="text-[10px] text-cyan-300">🎯</span>
+                            <span class="material-symbols-outlined text-xs">location_on</span><span>${escapeHtml(lmName)}</span><span class="material-symbols-outlined text-[11px] text-cyan-300">my_location</span>
                           </button>`;
                         })
                         .join('')}
@@ -1699,11 +1721,20 @@ function renderCalendarHistory() {
         <div class="amsale-card p-4 flex flex-col justify-between shadow opacity-90 hover:opacity-100 transition">
           <div>
             <div class="flex items-center justify-between mb-1.5 font-mono">
-              <span class="text-xs font-bold text-slate-300">📅 ${ethDateLabel}</span>
-              <span class="text-[10px] px-2 py-0.5 rounded font-semibold bg-emerald-950/70 text-emerald-300 border border-emerald-800">✅ ${t('status_concluded')}</span>
+              <span class="text-xs font-bold text-slate-300 flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs text-[#ffb873]">calendar_today</span>
+                <span>${ethDateLabel}</span>
+              </span>
+              <span class="text-[10px] px-2 py-0.5 rounded font-semibold bg-emerald-950/70 text-emerald-300 border border-emerald-800 inline-flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">check_circle</span>
+                <span>${t('status_concluded')}</span>
+              </span>
             </div>
             <div class="text-[11px] font-mono text-[#869397] mb-2">Gregorian: ${dateStr}</div>
-            <div class="text-xs font-mono text-slate-300 mb-1">🕒 Concluded: <strong>${ethTimeDisplay}</strong> (${civilTimeDisplay})</div>
+            <div class="text-xs font-mono text-slate-300 mb-1 flex items-center gap-1">
+              <span class="material-symbols-outlined text-xs text-white/80">schedule</span>
+              <span>Concluded: <strong>${ethTimeDisplay}</strong> (${civilTimeDisplay})</span>
+            </div>
             <div class="text-xs text-white font-medium mb-1">${displayArea}</div>
             <div class="text-[11px] text-slate-400">${currentLang === 'am' ? s.reason_am || s.reason : s.reason || 'Maintenance'}</div>
           </div>

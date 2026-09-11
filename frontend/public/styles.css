@@ -1,9 +1,9 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Amsale Monitoring System — Design System Stylesheet
    Stitch MCP: Premium Dark Modernism for Ethiopian Power Monitor
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
 
 :root {
@@ -35,10 +35,17 @@
 }
 
 body {
-  font-family: 'Inter', 'Noto Sans Ethiopic', sans-serif;
+  font-family: 'IBM Plex Sans', 'Noto Sans Ethiopic', sans-serif;
   background-color: var(--surface);
   color: var(--on-surface);
+  line-height: 1.65;
   letter-spacing: -0.01em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
 }
 
 /* Material Symbols alignment */
